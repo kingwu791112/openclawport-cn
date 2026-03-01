@@ -1,9 +1,10 @@
 'use client'
-import React, { useEffect, useRef, useState, useCallback } from 'react'
+import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Agent } from '@/lib/types'
 import type { Conversation, ConversationStore, Message, MediaAttachment } from '@/lib/conversations'
 import { parseMedia, addMessage, updateLastMessage } from '@/lib/conversations'
+import type { ContentPart, MessageContent } from '@/lib/validation'
 import { createAudioRecorder, formatDuration, blobToDataUrl, estimateStorageSize } from '@/lib/audio-recorder'
 import type { AudioRecorderHandle } from '@/lib/audio-recorder'
 import { VoiceMessage } from './VoiceMessage'
@@ -188,6 +189,29 @@ function shouldShowAvatar(messages: Message[], index: number): boolean {
   return messages[index - 1].role !== messages[index].role
 }
 
+/* ── Multimodal message builder ────────────────────────── */
+
+function buildApiContent(msg: Message): MessageContent {
+  const media = msg.media
+  if (!media || media.length === 0) return msg.content
+
+  const parts: ContentPart[] = []
+
+  if (msg.content) {
+    parts.push({ type: 'text', text: msg.content })
+  }
+
+  for (const attachment of media) {
+    if (attachment.type === 'image') {
+      parts.push({ type: 'image_url', image_url: { url: attachment.url } })
+    } else if (attachment.type === 'file') {
+      parts.push({ type: 'text', text: `[Attached file: ${attachment.name || 'unknown'}]` })
+    }
+  }
+
+  return parts.length > 0 ? parts : msg.content
+}
+
 /* ── Helper: convert File to base64 MediaAttachment ────── */
 
 async function fileToAttachment(file: File): Promise<MediaAttachment> {
@@ -285,6 +309,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
   const [isStreaming, setIsStreaming] = useState(false)
   const [pendingAttachments, setPendingAttachments] = useState<MediaAttachment[]>([])
   const [isRecording, setIsRecording] = useState(false)
+  const [isTranscribing, setIsTranscribing] = useState(false)
   const [recordingElapsed, setRecordingElapsed] = useState(0)
   const [isDragOver, setIsDragOver] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
@@ -310,14 +335,14 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
     }
   }, [])
 
-  const sendMessage = useCallback(async (mediaOverride?: MediaAttachment[]) => {
+  const sendMessage = useCallback(async (mediaOverride?: MediaAttachment[], contentOverride?: string) => {
     const mediaToSend = mediaOverride || [...pendingAttachments]
-    const hasText = input.trim().length > 0
+    const hasText = input.trim().length > 0 || !!contentOverride
     const hasMedia = mediaToSend.length > 0
 
     if ((!hasText && !hasMedia) || isStreaming) return
 
-    const text = input.trim()
+    const text = contentOverride || input.trim()
     setInput('')
     setPendingAttachments([])
 
@@ -362,7 +387,10 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
     setIsStreaming(true)
 
     // Use ref to read latest messages (avoids stale closure)
-    const apiMessages = [...messagesRef.current, userMsg].map(m => ({ role: m.role, content: m.content }))
+    const apiMessages = [...messagesRef.current, userMsg].map(m => ({
+      role: m.role,
+      content: buildApiContent(m),
+    }))
 
     try {
       const res = await fetch(`/api/chat/${agent.id}`, {
@@ -495,7 +523,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
 
   async function toggleRecording() {
     if (isRecording) {
-      // Stop and send
+      // Stop, transcribe, then send
       if (elapsedTimerRef.current) {
         clearInterval(elapsedTimerRef.current)
         elapsedTimerRef.current = null
@@ -509,6 +537,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
         const result = await recorder.stop()
         setIsRecording(false)
         if (result.duration < 0.5) return
+
         const voiceAttachment: MediaAttachment = {
           type: 'audio',
           url: result.dataUrl,
@@ -518,9 +547,28 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
           waveform: result.waveform,
           size: estimateStorageSize(result.dataUrl),
         }
-        sendMessage([voiceAttachment])
+
+        // Transcribe audio via Whisper
+        setIsTranscribing(true)
+        let transcript = ''
+        try {
+          const form = new FormData()
+          form.append('audio', result.audioBlob, 'voice.webm')
+          const res = await fetch('/api/transcribe', { method: 'POST', body: form })
+          if (res.ok) {
+            const data = await res.json()
+            transcript = data.text || ''
+          }
+        } catch {
+          // Transcription failed — send without transcript
+        }
+        setIsTranscribing(false)
+
+        // Send with transcript as content (agent sees text), waveform bubble for UI
+        sendMessage([voiceAttachment], transcript || undefined)
       } catch {
         setIsRecording(false)
+        setIsTranscribing(false)
       }
     } else {
       // Start recording
@@ -549,6 +597,86 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
     recorderRef.current?.cancel()
     setIsRecording(false)
   }
+
+  /* ── TTS playback ─────────────────────────────────────── */
+
+  const [ttsLoadingId, setTtsLoadingId] = useState<string | null>(null)
+  const [ttsPlayingId, setTtsPlayingId] = useState<string | null>(null)
+  const ttsAudioRef = useRef<HTMLAudioElement | null>(null)
+  const ttsObjectUrlRef = useRef<string | null>(null)
+
+  useEffect(() => {
+    return () => {
+      ttsAudioRef.current?.pause()
+      if (ttsObjectUrlRef.current) URL.revokeObjectURL(ttsObjectUrlRef.current)
+    }
+  }, [])
+
+  const stopTts = useCallback(() => {
+    if (ttsAudioRef.current) {
+      ttsAudioRef.current.pause()
+      ttsAudioRef.current.currentTime = 0
+      ttsAudioRef.current = null
+    }
+    if (ttsObjectUrlRef.current) {
+      URL.revokeObjectURL(ttsObjectUrlRef.current)
+      ttsObjectUrlRef.current = null
+    }
+    setTtsPlayingId(null)
+    setTtsLoadingId(null)
+  }, [])
+
+  const playTts = useCallback(async (msgId: string, text: string) => {
+    if (ttsPlayingId === msgId) { stopTts(); return }
+    stopTts()
+    setTtsLoadingId(msgId)
+
+    try {
+      const res = await fetch('/api/tts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text }),
+      })
+      if (!res.ok) throw new Error('TTS request failed')
+
+      const blob = await res.blob()
+      const url = URL.createObjectURL(blob)
+      ttsObjectUrlRef.current = url
+
+      const audio = new Audio(url)
+      ttsAudioRef.current = audio
+
+      audio.onended = () => {
+        setTtsPlayingId(null)
+        ttsAudioRef.current = null
+        if (ttsObjectUrlRef.current) {
+          URL.revokeObjectURL(ttsObjectUrlRef.current)
+          ttsObjectUrlRef.current = null
+        }
+      }
+      audio.onerror = () => stopTts()
+
+      await audio.play()
+      setTtsLoadingId(null)
+      setTtsPlayingId(msgId)
+    } catch {
+      stopTts()
+    }
+  }, [ttsPlayingId, stopTts])
+
+  const speakerPlayIcon = useMemo(() => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+      <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+    </svg>
+  ), [])
+
+  const speakerStopIcon = useMemo(() => (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="6" y="6" width="12" height="12" rx="2" />
+    </svg>
+  ), [])
 
   function clearChat() {
     onUpdate(agent.id, prev => ({
@@ -888,6 +1016,34 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
                             verticalAlign: 'text-bottom',
                           }} />
                         )}
+                        {/* TTS listen button */}
+                        {!isLastAssistant && textContent && (
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6 }}>
+                            <button
+                              onClick={() => playTts(msg.id, textContent)}
+                              disabled={ttsLoadingId === msg.id}
+                              title={ttsPlayingId === msg.id ? 'Stop listening' : 'Listen'}
+                              style={{
+                                background: 'none',
+                                border: 'none',
+                                cursor: ttsLoadingId === msg.id ? 'wait' : 'pointer',
+                                padding: '2px 4px',
+                                borderRadius: 'var(--radius-sm)',
+                                color: ttsPlayingId === msg.id ? 'var(--accent)' : 'var(--text-tertiary)',
+                                opacity: ttsLoadingId === msg.id ? 0.6 : 0.7,
+                                transition: 'all 150ms ease',
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 4,
+                                animation: ttsLoadingId === msg.id ? 'pulse-red 1.5s ease-in-out infinite' : 'none',
+                              }}
+                              onMouseEnter={e => { e.currentTarget.style.opacity = '1' }}
+                              onMouseLeave={e => { e.currentTarget.style.opacity = ttsPlayingId === msg.id ? '1' : '0.7' }}
+                            >
+                              {ttsPlayingId === msg.id ? speakerStopIcon : speakerPlayIcon}
+                            </button>
+                          </div>
+                        )}
                       </div>
                     )}
 
@@ -920,7 +1076,35 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
         )}
 
         {/* Recording UI or normal input */}
-        {isRecording ? (
+        {isTranscribing ? (
+          /* ── Transcribing state ───────────────────── */
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 'var(--space-3)',
+            background: 'var(--fill-secondary)',
+            borderRadius: 'var(--radius-lg)',
+            padding: 'var(--space-3) var(--space-4)',
+            border: '1px solid var(--separator)',
+            height: 48,
+          }}>
+            <div className="animate-error-pulse" style={{
+              width: 8,
+              height: 8,
+              borderRadius: '50%',
+              background: 'var(--accent)',
+              flexShrink: 0,
+            }} />
+            <span style={{
+              fontSize: 'var(--text-footnote)',
+              color: 'var(--text-secondary)',
+              fontWeight: 'var(--weight-medium)',
+            }}>
+              Transcribing...
+            </span>
+          </div>
+        ) : isRecording ? (
           /* ── Recording mode ───────────────────────── */
           <div style={{
             display: 'flex',

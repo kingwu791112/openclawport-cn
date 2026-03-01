@@ -1,69 +1,80 @@
-// Chat message validation — manual runtime checks (no external deps)
-// Single Responsibility: validation logic lives here, not in the route handler
-// Open/Closed: add new validation rules by extending the validators array
+// Validation for chat API messages — supports both plain text and multimodal (vision) content
 
-const VALID_ROLES = ['user', 'assistant', 'system'] as const
-type ValidRole = typeof VALID_ROLES[number]
+export type TextContentPart = { type: 'text'; text: string }
+export type ImageContentPart = { type: 'image_url'; image_url: { url: string } }
+export type ContentPart = TextContentPart | ImageContentPart
 
-export interface ValidatedChatMessage {
-  role: ValidRole
-  content: string
+export type MessageContent = string | ContentPart[]
+
+export interface ApiMessage {
+  role: 'user' | 'assistant' | 'system'
+  content: MessageContent
 }
 
-export type ValidationResult = {
-  ok: true
-  messages: ValidatedChatMessage[]
-} | {
-  ok: false
-  error: string
+function isValidContentPart(part: unknown): part is ContentPart {
+  if (typeof part !== 'object' || part === null) return false
+  const p = part as Record<string, unknown>
+
+  if (p.type === 'text') {
+    return typeof p.text === 'string'
+  }
+
+  if (p.type === 'image_url') {
+    const imgUrl = p.image_url
+    if (typeof imgUrl !== 'object' || imgUrl === null) return false
+    return typeof (imgUrl as Record<string, unknown>).url === 'string'
+  }
+
+  return false
 }
 
-/**
- * Validates that the parsed request body contains a well-formed messages array.
- * Returns a discriminated union so the caller can branch on `ok`.
- */
+function isValidContent(content: unknown): content is MessageContent {
+  if (typeof content === 'string') return true
+
+  if (Array.isArray(content)) {
+    return content.length > 0 && content.every(isValidContentPart)
+  }
+
+  return false
+}
+
+export function validateMessages(messages: unknown): ApiMessage[] {
+  if (!Array.isArray(messages)) {
+    throw new Error('messages must be an array')
+  }
+
+  return messages.map((msg, i) => {
+    if (typeof msg !== 'object' || msg === null) {
+      throw new Error(`messages[${i}] must be an object`)
+    }
+
+    const m = msg as Record<string, unknown>
+
+    if (typeof m.role !== 'string' || !['user', 'assistant', 'system'].includes(m.role)) {
+      throw new Error(`messages[${i}].role must be "user", "assistant", or "system"`)
+    }
+
+    if (!isValidContent(m.content)) {
+      throw new Error(`messages[${i}].content must be a string or array of content parts`)
+    }
+
+    return { role: m.role as ApiMessage['role'], content: m.content as MessageContent }
+  })
+}
+
+// Legacy export for backward compatibility with existing test
+export type ValidatedChatMessage = ApiMessage
+export type ValidationResult = { ok: true; messages: ApiMessage[] } | { ok: false; error: string }
+
 export function validateChatMessages(body: unknown): ValidationResult {
   if (body === null || typeof body !== 'object') {
     return { ok: false, error: 'Request body must be a JSON object.' }
   }
-
   const { messages } = body as Record<string, unknown>
-
-  if (!Array.isArray(messages)) {
-    return { ok: false, error: '`messages` must be an array.' }
+  try {
+    const validated = validateMessages(messages)
+    return { ok: true, messages: validated }
+  } catch (err) {
+    return { ok: false, error: err instanceof Error ? err.message : 'Invalid messages' }
   }
-
-  if (messages.length === 0) {
-    return { ok: false, error: '`messages` must not be empty.' }
-  }
-
-  const validated: ValidatedChatMessage[] = []
-
-  for (let i = 0; i < messages.length; i++) {
-    const msg = messages[i]
-
-    if (msg === null || typeof msg !== 'object') {
-      return { ok: false, error: `messages[${i}] must be an object.` }
-    }
-
-    const { role, content } = msg as Record<string, unknown>
-
-    if (typeof role !== 'string' || !(VALID_ROLES as readonly string[]).includes(role)) {
-      return {
-        ok: false,
-        error: `messages[${i}].role must be one of: ${VALID_ROLES.join(', ')}. Got: ${JSON.stringify(role)}`,
-      }
-    }
-
-    if (typeof content !== 'string') {
-      return {
-        ok: false,
-        error: `messages[${i}].content must be a string. Got: ${typeof content}`,
-      }
-    }
-
-    validated.push({ role: role as ValidRole, content })
-  }
-
-  return { ok: true, messages: validated }
 }

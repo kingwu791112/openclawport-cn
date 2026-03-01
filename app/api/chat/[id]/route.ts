@@ -52,7 +52,10 @@ export async function POST(
     const stream = await openai.chat.completions.create({
       model: 'claude-sonnet-4-6',
       stream: true,
-      messages: [{ role: 'system', content: systemPrompt }, ...messages],
+      messages: [
+        { role: 'system' as const, content: systemPrompt },
+        ...messages.map(m => ({ role: m.role, content: m.content })),
+      ] as OpenAI.ChatCompletionMessageParam[],
     })
 
     const body = new ReadableStream({

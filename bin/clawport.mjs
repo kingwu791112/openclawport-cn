@@ -17,6 +17,8 @@ const PKG_ROOT = resolve(dirname(__filename), '..')
 // Helpers
 // ---------------------------------------------------------------------------
 
+const NEXT_BIN = resolve(PKG_ROOT, 'node_modules', '.bin', 'next')
+
 const green = (s) => `\x1b[32m${s}\x1b[0m`
 const yellow = (s) => `\x1b[33m${s}\x1b[0m`
 const red = (s) => `\x1b[31m${s}\x1b[0m`
@@ -60,12 +62,12 @@ ${dim(`Package root: ${PKG_ROOT}`)}
 
 function cmdDev() {
   console.log(`\n  ${bold('Starting ClawPort dev server...')}\n`)
-  run('npx', ['next', 'dev'])
+  run(NEXT_BIN, ['dev'])
 }
 
 function cmdStart() {
   console.log(`\n  ${bold('Building and starting ClawPort...')}\n`)
-  run('npx', ['next', 'build', '&&', 'npx', 'next', 'start'])
+  run(NEXT_BIN, ['build', '&&', NEXT_BIN, 'start'])
 }
 
 function cmdSetup() {

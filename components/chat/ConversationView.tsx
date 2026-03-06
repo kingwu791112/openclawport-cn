@@ -7,6 +7,8 @@ import { parseMedia, addMessage, updateLastMessage } from '@/lib/conversations'
 import { buildApiContent } from '@/lib/multimodal'
 import { generateId } from '@/lib/id'
 import { useSettings } from '@/app/settings-provider'
+import { isSlashInput, matchCommands, parseSlashCommand, executeCommand } from '@/lib/slash-commands'
+import type { SlashCommand } from '@/lib/slash-commands'
 import { FileAttachment } from './FileAttachment'
 import { MediaPreview } from './MediaPreview'
 import { AgentAvatar } from '@/components/AgentAvatar'
@@ -293,6 +295,9 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
   const [isStreaming, setIsStreaming] = useState(false)
   const [pendingAttachments, setPendingAttachments] = useState<MediaAttachment[]>([])
   const [isDragOver, setIsDragOver] = useState(false)
+  const [slashMatches, setSlashMatches] = useState<SlashCommand[]>([])
+  const [slashIndex, setSlashIndex] = useState(0)
+  const slashMenuOpen = slashMatches.length > 0
   const bottomRef = useRef<HTMLDivElement>(null)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -355,10 +360,12 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
     setIsStreaming(true)
 
     // Use ref to read latest messages (avoids stale closure)
-    const apiMessages = [...messagesRef.current, userMsg].map(m => ({
-      role: m.role,
-      content: buildApiContent(m),
-    }))
+    const apiMessages = [...messagesRef.current, userMsg]
+      .filter(m => m.role !== 'system')
+      .map(m => ({
+        role: m.role,
+        content: buildApiContent(m),
+      }))
 
     try {
       const res = await fetch(`/api/chat/${agent.id}`, {
@@ -404,7 +411,52 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
     }
   }, [input, pendingAttachments, isStreaming, agent.id, onUpdate])
 
+  function runSlashCommand(command: string) {
+    const result = executeCommand(command, agent)
+    if (result.action === 'clear') {
+      clearChat()
+    } else {
+      const sysMsg: Message = {
+        id: generateId(),
+        role: 'system',
+        content: result.content,
+        timestamp: Date.now(),
+      }
+      onUpdate(agent.id, prev => addMessage(prev, agent.id, sysMsg))
+    }
+    setInput('')
+    setSlashMatches([])
+    if (textareaRef.current) textareaRef.current.style.height = 'auto'
+  }
+
+  function handleSlashSelect(cmd: SlashCommand) {
+    runSlashCommand(cmd.name)
+  }
+
   function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (slashMenuOpen) {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        setSlashIndex(i => (i + 1) % slashMatches.length)
+        return
+      }
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        setSlashIndex(i => (i - 1 + slashMatches.length) % slashMatches.length)
+        return
+      }
+      if (e.key === 'Enter' || e.key === 'Tab') {
+        e.preventDefault()
+        handleSlashSelect(slashMatches[slashIndex])
+        return
+      }
+      if (e.key === 'Escape') {
+        e.preventDefault()
+        setSlashMatches([])
+        return
+      }
+    }
+
     if (e.key === 'Escape') {
       e.preventDefault()
       textareaRef.current?.blur()
@@ -412,6 +464,11 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
     }
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault()
+      const parsed = parseSlashCommand(input)
+      if (parsed) {
+        runSlashCommand(parsed.command)
+        return
+      }
       sendMessage()
     }
   }
@@ -747,7 +804,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
           const isUser = msg.role === 'user'
           const showAvatar = shouldShowAvatar(messages, i)
           const showTimestamp = shouldShowTimestamp(messages, i)
-          const isLastAssistant = !isUser && i === messages.length - 1 && (isStreaming || msg.isStreaming)
+          const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1 && (isStreaming || msg.isStreaming)
           const showTypingDots = isLastAssistant && !msg.content
           const media = msg.media || parseMedia(msg.content)
 
@@ -817,8 +874,30 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
                 </div>
               )}
 
+              {/* System message (slash command result) */}
+              {msg.role === 'system' && (
+                <div style={{
+                  padding: '0 var(--space-4)',
+                  marginBottom: 'var(--space-1)',
+                }}>
+                  <div style={{
+                    maxWidth: '85%',
+                    margin: '0 auto',
+                    padding: 'var(--space-3) var(--space-4)',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--fill-tertiary)',
+                    borderLeft: '3px solid var(--accent)',
+                    color: 'var(--text-secondary)',
+                    fontSize: 'var(--text-footnote)',
+                    lineHeight: 'var(--leading-relaxed)',
+                  }}>
+                    {formatMessage(msg.content)}
+                  </div>
+                </div>
+              )}
+
               {/* Assistant message */}
-              {!isUser && (
+              {msg.role === 'assistant' && (
                 <div style={{
                   display: 'flex',
                   justifyContent: 'flex-start',
@@ -898,6 +977,64 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
         background: 'var(--material-regular)',
         flexShrink: 0,
       }}>
+        {/* Slash command autocomplete dropdown */}
+        {slashMenuOpen && (
+          <div
+            className="animate-slide-down"
+            style={{
+              marginBottom: 'var(--space-2)',
+              background: 'var(--material-thick)',
+              border: '1px solid var(--separator)',
+              borderRadius: 'var(--radius-md)',
+              boxShadow: 'var(--shadow-overlay)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              overflow: 'hidden',
+            }}
+          >
+            {slashMatches.map((cmd, i) => (
+              <button
+                key={cmd.name}
+                onMouseDown={e => {
+                  e.preventDefault() // prevent textarea blur
+                  handleSlashSelect(cmd)
+                }}
+                onMouseEnter={() => setSlashIndex(i)}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 'var(--space-3)',
+                  width: '100%',
+                  padding: 'var(--space-2) var(--space-3)',
+                  background: i === slashIndex ? 'var(--fill-secondary)' : 'transparent',
+                  border: 'none',
+                  cursor: 'pointer',
+                  textAlign: 'left',
+                  color: 'var(--text-primary)',
+                  fontSize: 'var(--text-subheadline)',
+                  transition: 'background 100ms',
+                }}
+              >
+                <span style={{
+                  color: 'var(--accent)',
+                  fontWeight: 'var(--weight-semibold)',
+                  fontFamily: '"SF Mono", Menlo, monospace',
+                  fontSize: 'var(--text-footnote)',
+                  minWidth: 60,
+                }}>
+                  {cmd.name}
+                </span>
+                <span style={{
+                  color: 'var(--text-tertiary)',
+                  fontSize: 'var(--text-caption1)',
+                }}>
+                  {cmd.description}
+                </span>
+              </button>
+            ))}
+          </div>
+        )}
+
         {/* Pending attachments preview */}
         {pendingAttachments.length > 0 && (
           <div style={{ marginBottom: 'var(--space-2)' }}>
@@ -948,7 +1085,17 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
             <textarea
               ref={textareaRef}
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={e => {
+                const val = e.target.value
+                setInput(val)
+                if (isSlashInput(val) && !val.includes(' ')) {
+                  const matches = matchCommands(val)
+                  setSlashMatches(matches)
+                  setSlashIndex(0)
+                } else {
+                  setSlashMatches([])
+                }
+              }}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
               placeholder={`Message ${agent.name}...`}
@@ -1012,7 +1159,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
           textAlign: 'center',
           marginTop: 'var(--space-1)',
         }}>
-          Enter to send &middot; Shift+Enter for newline
+          Enter to send &middot; Shift+Enter for newline &middot; / for commands
         </div>
       </div>
     </div>

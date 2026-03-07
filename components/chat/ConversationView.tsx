@@ -181,14 +181,22 @@ function formatTimestamp(ts: number): string {
 }
 
 function shouldShowTimestamp(messages: Message[], index: number): boolean {
-  if (index === 0) return true
-  const gap = messages[index].timestamp - messages[index - 1].timestamp
+  if (messages[index].role === 'system') return false
+  // Find previous non-system message for gap comparison
+  let prev = index - 1
+  while (prev >= 0 && messages[prev].role === 'system') prev--
+  if (prev < 0) return true
+  const gap = messages[index].timestamp - messages[prev].timestamp
   return gap > 5 * 60 * 1000 // 5 minutes
 }
 
 function shouldShowAvatar(messages: Message[], index: number): boolean {
-  if (index === 0) return true
-  return messages[index - 1].role !== messages[index].role
+  if (messages[index].role === 'system') return false
+  // Find previous non-system message for role comparison
+  let prev = index - 1
+  while (prev >= 0 && messages[prev].role === 'system') prev--
+  if (prev < 0) return true
+  return messages[prev].role !== messages[index].role
 }
 
 /* ── Helper: convert File to base64 MediaAttachment ────── */
@@ -804,13 +812,15 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
           const isUser = msg.role === 'user'
           const showAvatar = shouldShowAvatar(messages, i)
           const showTimestamp = shouldShowTimestamp(messages, i)
+          // System messages render their own block — skip user/assistant layout logic
+          const isSystem = msg.role === 'system'
           const isLastAssistant = msg.role === 'assistant' && i === messages.length - 1 && (isStreaming || msg.isStreaming)
           const showTypingDots = isLastAssistant && !msg.content
-          const media = msg.media || parseMedia(msg.content)
+          const media = isSystem ? [] : (msg.media || parseMedia(msg.content))
 
           // Strip media URLs from text for display
           let textContent = msg.content
-          if (media.length > 0 && !msg.media) {
+          if (!isSystem && media.length > 0 && !msg.media) {
             media.forEach(m => {
               textContent = textContent.replace(m.url, '')
               textContent = textContent.replace(/!\[[^\]]*\]\([^\)]+\)/g, '')
@@ -818,7 +828,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
             textContent = textContent.trim()
           }
           // Hide auto-generated content labels for media-only messages
-          if (msg.media && msg.media.length > 0) {
+          if (!isSystem && msg.media && msg.media.length > 0) {
             const isAutoLabel = textContent.startsWith('[') && textContent.endsWith(']')
             if (isAutoLabel) textContent = ''
           }
@@ -837,10 +847,13 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
                 </div>
               )}
 
-              {/* Spacing between role switches */}
-              {!showTimestamp && i > 0 && (
-                <div style={{ height: messages[i - 1].role !== msg.role ? 'var(--space-4)' : 'var(--space-1)' }} />
-              )}
+              {/* Spacing between role switches (skip for system messages) */}
+              {!showTimestamp && i > 0 && msg.role !== 'system' && (() => {
+                let prev = i - 1
+                while (prev >= 0 && messages[prev].role === 'system') prev--
+                const prevRole = prev >= 0 ? messages[prev].role : msg.role
+                return <div style={{ height: prevRole !== msg.role ? 'var(--space-4)' : 'var(--space-1)' }} />
+              })()}
 
               {/* User message */}
               {isUser && (

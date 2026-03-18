@@ -7,6 +7,7 @@ import type { KanbanTicket, TicketStatus, TicketPriority } from '@/lib/kanban/ty
 import { PRIORITY_COLORS, ROLE_LABELS, COLUMNS } from '@/lib/kanban/types'
 import { AgentAvatar } from '@/components/AgentAvatar'
 import { generateId } from '@/lib/id'
+import { i18n } from '@/lib/i18n'
 
 /* ── Chat message type (local to kanban) ─────────────── */
 
@@ -290,7 +291,7 @@ export function TicketDetailPanel({
         }),
       })
 
-      if (!res.ok || !res.body) throw new Error('Stream failed')
+      if (!res.ok || !res.body) throw new Error(i18n.kanban.streamFailed)
 
       const reader = res.body.getReader()
       const decoder = new TextDecoder()
@@ -338,7 +339,7 @@ export function TicketDetailPanel({
         body: JSON.stringify({ messages: [userMsg, completedAssistant] }),
       }).catch(() => { /* persist best-effort */ })
     } catch {
-      const errorContent = 'Error getting response. Check API connection.'
+      const errorContent = i18n.kanban.apiError
       setMessages(prev =>
         prev.map(m => m.id === assistantMsgId
           ? { ...m, content: errorContent, isStreaming: false }
@@ -408,7 +409,7 @@ export function TicketDetailPanel({
             <button
               onClick={() => setExpanded(e => !e)}
               className="focus-ring"
-              aria-label={expanded ? 'Collapse panel' : 'Expand panel'}
+              aria-label={expanded ? i18n.kanban.collapsePanel : i18n.kanban.expandPanel}
               style={{
                 width: 28,
                 height: 28,

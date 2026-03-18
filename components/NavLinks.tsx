@@ -8,6 +8,7 @@ import type { LucideIcon } from 'lucide-react';
 import type { CronJob } from '@/lib/types';
 import { useSettings } from '@/app/settings-provider';
 import { useAgentsContext } from '@/app/agents-provider';
+import { i18n } from '@/lib/i18n';
 
 function getInitials(name: string | null): string {
   if (!name) return '??'
@@ -28,15 +29,15 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: '/', label: 'Map', icon: Map, badge: 'agents' },
-  { href: '/kanban', label: 'Kanban', icon: Columns3 },
-  { href: '/chat', label: 'Messages', icon: MessageSquare, badge: 'unread' },
-  { href: '/crons', label: 'Crons', icon: Clock, badge: 'errors' },
-  { href: '/activity', label: 'Activity', icon: Activity },
-  { href: '/costs', label: 'Costs', icon: DollarSign },
-  { href: '/memory', label: 'Memory', icon: Brain },
-  { href: '/docs', label: 'Docs', icon: BookOpen },
-  { href: '/settings', label: 'Settings', icon: Settings },
+  { href: '/', label: i18n.nav.items.home, icon: Map, badge: 'agents' },
+  { href: '/kanban', label: i18n.nav.items.kanban, icon: Columns3 },
+  { href: '/chat', label: i18n.nav.items.chat, icon: MessageSquare, badge: 'unread' },
+  { href: '/crons', label: i18n.nav.items.crons, icon: Clock, badge: 'errors' },
+  { href: '/activity', label: i18n.nav.items.activity, icon: Activity },
+  { href: '/costs', label: i18n.nav.items.costs, icon: DollarSign },
+  { href: '/memory', label: i18n.nav.items.memory, icon: Brain },
+  { href: '/docs', label: i18n.nav.items.docs, icon: BookOpen },
+  { href: '/settings', label: i18n.nav.items.settings, icon: Settings },
 ];
 
 // ---------------------------------------------------------------------------
@@ -115,7 +116,7 @@ export function NavLinks({ bottomSlot }: { bottomSlot?: React.ReactNode } = {}) 
               fontWeight: hasErrors ? 600 : undefined,
             }}
           >
-            {hasErrors ? `${cronErrorCount} err` : cronCount}
+            {hasErrors ? `${cronErrorCount} 错误` : cronCount}
           </span>
           {hasErrors && (
             <span
@@ -152,8 +153,8 @@ export function NavLinks({ bottomSlot }: { bottomSlot?: React.ReactNode } = {}) 
             marginBottom: '2px',
           }}
         >
-          Workspace
-        </div>
+            {i18n.nav.workspace}
+          </div>
 
         <div className="flex flex-col gap-0.5">
           {NAV_ITEMS.map((item) => {

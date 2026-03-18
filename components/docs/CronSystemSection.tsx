@@ -8,226 +8,210 @@ import {
   BulletList,
   Callout,
 } from "./DocSection";
+import { docs } from "@/lib/i18n-docs";
 
 export function CronSystemSection() {
+  const cron = docs.cronSystem;
   return (
     <>
-      <Heading>Cron System</Heading>
+      <Heading>{cron.title}</Heading>
       <Paragraph>
-        ClawPort provides a full cron monitoring dashboard with three views:
-        overview (health donut, attention cards, error banners), weekly schedule
-        (7-day calendar grid), and pipeline graph (React Flow dependency
-        visualization). Data is fetched from the OpenClaw CLI and auto-refreshes
-        every 60 seconds.
+        ClawPort 提供完整的定时任务监控仪表板，包含三个视图：概览（健康环形图、关注卡片、错误横幅）、周计划（7 天日历网格）和管道图（React Flow 依赖可视化）。数据从 OpenClaw CLI 获取并每 60 秒自动刷新。
       </Paragraph>
 
-      <SubHeading>CronJob Schema</SubHeading>
+      <SubHeading>CronJob 结构</SubHeading>
       <Table
-        headers={["Field", "Type", "Description"]}
+        headers={["字段", "类型", "说明"]}
         rows={[
-          [<InlineCode key="id">id</InlineCode>, "string", "Job identifier"],
+          [<InlineCode key="id">id</InlineCode>, "string", "任务标识符"],
           [
             <InlineCode key="n">name</InlineCode>,
             "string",
-            "Job name (used to match owning agent by prefix)",
+            "任务名称（用于按前缀匹配所属智能体）",
           ],
           [
             <InlineCode key="s">schedule</InlineCode>,
             "string",
-            "Raw cron expression",
+            "原始 cron 表达式",
           ],
           [
             <InlineCode key="sd">scheduleDescription</InlineCode>,
             "string",
-            'Human-readable (e.g., "Daily at 8 AM")',
+            "人类可读（例如 \"每天 早上 8 点\"）",
           ],
           [
             <InlineCode key="tz">timezone</InlineCode>,
             "string | null",
-            "Timezone from schedule object, if present",
+            "来自调度对象的时区（如果存在）",
           ],
           [
             <InlineCode key="st">status</InlineCode>,
             '"ok" | "error" | "idle"',
-            "Last run outcome",
+            "上次运行结果",
           ],
           [
             <InlineCode key="lr">lastRun</InlineCode>,
             "string | null",
-            "ISO 8601 timestamp of last execution",
+            "上次执行的 ISO 8601 时间戳",
           ],
           [
             <InlineCode key="nr">nextRun</InlineCode>,
             "string | null",
-            "ISO 8601 timestamp of next scheduled run",
+            "下次计划运行的 ISO 8601 时间戳",
           ],
           [
             <InlineCode key="le">lastError</InlineCode>,
             "string | null",
-            "Error message from last failed run",
+            "上次失败运行的错误消息",
           ],
           [
             <InlineCode key="ai">agentId</InlineCode>,
             "string | null",
-            "Owning agent ID (matched by job name prefix)",
+            "所属智能体 ID（按任务名称前缀匹配）",
           ],
           [
             <InlineCode key="en">enabled</InlineCode>,
             "boolean",
-            "Whether the job is active",
+            "任务是否激活",
           ],
           [
             <InlineCode key="dl">delivery</InlineCode>,
             "CronDelivery | null",
-            "Delivery config (mode, channel, to)",
+            "交付配置（模式、渠道、接收人）",
           ],
           [
             <InlineCode key="ld">lastDurationMs</InlineCode>,
             "number | null",
-            "Duration of last run in milliseconds",
+            "上次运行时长（毫秒）",
           ],
           [
             <InlineCode key="ce">consecutiveErrors</InlineCode>,
             "number",
-            "Count of consecutive failed runs",
+            "连续失败次数",
           ],
         ]}
       />
 
-      <SubHeading>CronRun Schema</SubHeading>
+      <SubHeading>CronRun 结构</SubHeading>
       <Paragraph>
-        Run history is parsed from JSONL log files at{" "}
-        <InlineCode>$WORKSPACE_PATH/../cron/runs/</InlineCode>. Each line in the
-        JSONL file represents one run.
+        运行历史从 <InlineCode>$WORKSPACE_PATH/../cron/runs/</InlineCode> 的 JSONL 日志文件解析。JSONL 文件中的每一行代表一次运行。
       </Paragraph>
       <Table
-        headers={["Field", "Type", "Description"]}
+        headers={["字段", "类型", "说明"]}
         rows={[
           [
             <InlineCode key="ts">ts</InlineCode>,
             "number",
-            "Unix timestamp (milliseconds) of the run",
+            "运行的 Unix 时间戳（毫秒）",
           ],
           [
             <InlineCode key="j">jobId</InlineCode>,
             "string",
-            "Job identifier",
+            "任务标识符",
           ],
           [
             <InlineCode key="s">status</InlineCode>,
             '"ok" | "error"',
-            "Run outcome",
+            "运行结果",
           ],
           [
             <InlineCode key="su">summary</InlineCode>,
             "string | null",
-            "Summary of what the run produced",
+            "运行产出的摘要",
           ],
           [
             <InlineCode key="e">error</InlineCode>,
             "string | null",
-            "Error message if the run failed",
+            "运行失败时的错误消息",
           ],
           [
             <InlineCode key="d">durationMs</InlineCode>,
             "number",
-            "Duration in milliseconds",
+            "运行时长（毫秒）",
           ],
           [
             <InlineCode key="ds">deliveryStatus</InlineCode>,
             "string | null",
-            "Delivery outcome",
+            "交付结果",
           ],
         ]}
       />
 
-      <SubHeading>Agent Ownership</SubHeading>
+      <SubHeading>智能体所有权</SubHeading>
       <Paragraph>
-        Cron jobs are matched to agents by job name prefix. When the API fetches
-        crons via <InlineCode>openclaw cron list --json</InlineCode>, it
-        enriches each job with an <InlineCode>agentId</InlineCode> field by
-        checking whether the job name starts with an agent's id. This enables
-        the UI to show agent avatars next to cron entries and filter crons by
-        agent.
+        定时任务按任务名称前缀匹配到智能体。当 API 通过 <InlineCode>openclaw cron list --json</InlineCode> 获取定时任务时，
+        它通过检查任务名称是否以智能体 ID 开头来为每个任务添加 <InlineCode>agentId</InlineCode> 字段。
+        这使得 UI 可以在定时任务条目旁边显示智能体头像，并按智能体过滤定时任务。
       </Paragraph>
 
-      <SubHeading>Delivery Configuration</SubHeading>
+      <SubHeading>交付配置</SubHeading>
       <Table
-        headers={["Field", "Type", "Description"]}
+        headers={["字段", "类型", "说明"]}
         rows={[
           [
             <InlineCode key="m">mode</InlineCode>,
             "string",
-            "Delivery mode",
+            "交付模式",
           ],
           [
             <InlineCode key="c">channel</InlineCode>,
             "string",
-            "Delivery channel",
+            "交付渠道",
           ],
           [
             <InlineCode key="t">to</InlineCode>,
             "string | null",
-            "Delivery recipient",
+            "交付接收人",
           ],
         ]}
       />
 
-      <SubHeading>Status Types</SubHeading>
+      <SubHeading>状态类型</SubHeading>
       <BulletList
         items={[
           <>
-            <strong style={{ color: "var(--system-green)" }}>ok</strong> -- Last
-            run completed successfully
+            <strong style={{ color: "var(--system-green)" }}>ok</strong> -- 上次运行成功完成
           </>,
           <>
-            <strong style={{ color: "var(--system-red)" }}>error</strong> -- Last
-            run failed (error details in lastError)
+            <strong style={{ color: "var(--system-red)" }}>error</strong> -- 上次运行失败（错误详情在 lastError 中）
           </>,
           <>
-            <strong style={{ color: "var(--text-tertiary)" }}>idle</strong> --
-            Job has never run or has no recent activity
+            <strong style={{ color: "var(--text-tertiary)" }}>idle</strong> -- 任务从未运行或没有近期活动
           </>,
         ]}
       />
 
-      <SubHeading>Monitoring Views</SubHeading>
+      <SubHeading>监控视图</SubHeading>
       <BulletList
         items={[
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Overview</strong>{" "}
-            -- Health donut chart (SVG), attention-needed cards for errored
-            crons, delivery stats, error banners with expandable details, recent
-            runs list
+            <strong style={{ color: "var(--text-primary)" }}>概览</strong>{" "}
+            -- 健康环形图（SVG）、需要关注的错误定时任务卡片、交付统计、带可展开详情的错误横幅、最近运行列表
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Schedule</strong>{" "}
-            -- Seven-day calendar grid showing when cron jobs are scheduled to
-            run. Current time indicator as a red horizontal line.
+            <strong style={{ color: "var(--text-primary)" }}>计划</strong>{" "}
+            -- 7 天日历网格，显示定时任务计划运行的时间。当前时间指示器为红色水平线。
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Pipelines</strong>{" "}
-            -- React Flow visualization of cron job pipelines showing
-            dependencies between stages
+            <strong style={{ color: "var(--text-primary)" }}>管道</strong>{" "}
+            -- React Flow 可视化显示定时任务管道的阶段依赖关系
           </>,
         ]}
       />
 
       <Callout type="note">
-        The cron page auto-refreshes every 60 seconds. The sidebar also fetches
-        cron error counts on mount and displays a red pulsing dot badge when
-        errors are present.
+        定时任务页面每 60 秒自动刷新。侧边栏也在挂载时获取定时任务错误计数，并在存在错误时显示红色脉冲点徽章。
       </Callout>
 
-      <SubHeading>API Endpoint</SubHeading>
-      <CodeBlock title="terminal">
-        {`# Fetch all crons
+      <SubHeading>API 端点</SubHeading>
+      <CodeBlock title="终端">
+        {`# 获取所有定时任务
 curl http://localhost:3000/api/crons
 
-# Fetch run history for a specific job
+# 获取特定任务的运行历史
 curl "http://localhost:3000/api/cron-runs?jobId=pulse-daily-digest"
 
-# Fetch all run history
+# 获取所有运行历史
 curl http://localhost:3000/api/cron-runs`}
       </CodeBlock>
     </>

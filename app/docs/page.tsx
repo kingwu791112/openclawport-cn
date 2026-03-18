@@ -10,6 +10,7 @@ import { ThemingSection } from "@/components/docs/ThemingSection";
 import { ComponentsSection } from "@/components/docs/ComponentsSection";
 import { TroubleshootingSection } from "@/components/docs/TroubleshootingSection";
 import { BestPracticesSection } from "@/components/docs/BestPracticesSection";
+import { docs } from "@/lib/i18n-docs";
 
 /* ─── Section Definitions ──────────────────────────────────────── */
 
@@ -24,65 +25,65 @@ interface DocSectionDef {
 const SECTIONS: DocSectionDef[] = [
   {
     id: "getting-started",
-    label: "Getting Started",
+    label: docs.sections["getting-started"].label,
     emoji: "\u{1F680}",
-    description: "Setup, prerequisites, env vars",
+    description: docs.sections["getting-started"].description,
     component: GettingStartedSection,
   },
   {
     id: "architecture",
-    label: "Architecture",
+    label: docs.sections.architecture.label,
     emoji: "\u{1F3D7}\u{FE0F}",
-    description: "System overview, pipelines, data flows",
+    description: docs.sections.architecture.description,
     component: ArchitectureSection,
   },
   {
     id: "agents",
-    label: "Agents",
+    label: docs.sections.agents.label,
     emoji: "\u{1F916}",
-    description: "Registry, hierarchy, customization",
+    description: docs.sections.agents.description,
     component: AgentsSection,
   },
   {
     id: "best-practices",
-    label: "Best Practices",
+    label: docs.sections["best-practices"].label,
     emoji: "\u{1F3AF}",
-    description: "Hierarchy, memory, tools, naming",
+    description: docs.sections["best-practices"].description,
     component: BestPracticesSection,
   },
   {
     id: "api-reference",
-    label: "API Reference",
+    label: docs.sections["api-reference"].label,
     emoji: "\u{1F50C}",
-    description: "All endpoints, request/response",
+    description: docs.sections["api-reference"].description,
     component: ApiReferenceSection,
   },
   {
     id: "cron-system",
-    label: "Cron System",
+    label: docs.sections["cron-system"].label,
     emoji: "\u{23F0}",
-    description: "Schedules, monitoring, delivery",
+    description: docs.sections["cron-system"].description,
     component: CronSystemSection,
   },
   {
     id: "theming",
-    label: "Theming",
+    label: docs.sections.theming.label,
     emoji: "\u{1F3A8}",
-    description: "Themes, CSS properties, customization",
+    description: docs.sections.theming.description,
     component: ThemingSection,
   },
   {
     id: "components",
-    label: "Components",
+    label: docs.sections.components.label,
     emoji: "\u{1F9E9}",
-    description: "Component tree, props, patterns",
+    description: docs.sections.components.description,
     component: ComponentsSection,
   },
   {
     id: "troubleshooting",
-    label: "Troubleshooting",
+    label: docs.sections.troubleshooting.label,
     emoji: "\u{1F527}",
-    description: "Common issues and solutions",
+    description: docs.sections.troubleshooting.description,
     component: TroubleshootingSection,
   },
 ];
@@ -219,7 +220,7 @@ export default function DocsPage() {
               color: "var(--text-primary)",
             }}
           >
-            Docs
+            {docs.pageTitle}
           </span>
         </div>
 
@@ -228,7 +229,7 @@ export default function DocsPage() {
           <input
             ref={searchRef}
             type="search"
-            placeholder="Search sections..."
+            placeholder={docs.searchPlaceholder}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="apple-input focus-ring"
@@ -260,7 +261,7 @@ export default function DocsPage() {
                 color: "var(--text-tertiary)",
               }}
             >
-              No sections match
+              {docs.noSectionsMatch}
             </div>
           ) : (
             filteredSections.map((section) => {
@@ -361,7 +362,7 @@ export default function DocsPage() {
             }}
           >
             <BackArrow />
-            Sections
+            {docs.backToSections}
           </button>
 
           <div className="flex items-center gap-3">

@@ -9,233 +9,215 @@ import {
   NumberedList,
   Callout,
 } from "./DocSection";
+import { docs } from "@/lib/i18n-docs";
 
 export function AgentsSection() {
+  const a = docs.agents;
   return (
     <>
-      <Heading>Agents</Heading>
+      <Heading>{a.title}</Heading>
       <Paragraph>
-        ClawPort automatically discovers your agents from your OpenClaw
-        workspace. No configuration is needed -- if you have agents in your
-        workspace, ClawPort will find and display them.
+        ClawPort 会自动从你的 OpenClaw 工作空间发现智能体。无需配置 —— 如果你的工作空间中有智能体，ClawPort 会找到并显示它们。
       </Paragraph>
 
-      <SubHeading>Auto-Discovery (Default)</SubHeading>
+      <SubHeading>自动发现 (默认)</SubHeading>
       <Paragraph>
-        ClawPort scans <InlineCode>$WORKSPACE_PATH/agents/</InlineCode> for
-        subdirectories containing a <InlineCode>SOUL.md</InlineCode> file. Each
-        becomes an agent with:
+        ClawPort 扫描 <InlineCode>$WORKSPACE_PATH/agents/</InlineCode> 中包含 <InlineCode>SOUL.md</InlineCode> 文件的子目录。每个目录成为一个智能体，包含：
       </Paragraph>
       <BulletList
         items={[
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Name</strong> from
-            the first <InlineCode># Heading</InlineCode> in SOUL.md, or the
-            directory name as fallback
+            <strong style={{ color: "var(--text-primary)" }}>名称</strong> 来自
+            SOUL.md 中的第一个 <InlineCode># 标题</InlineCode>，或退而使用目录名
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Title</strong> from
-            a role description after an em-dash in the heading (e.g., "ECHO --
-            Community Voice Monitor")
+            <strong style={{ color: "var(--text-primary)" }}>职位</strong> 来自
+            标题中破折号后的角色描述 (例如 "ECHO -- 社区声音监控器")
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Sub-agents</strong>{" "}
-            from <InlineCode>sub-agents/</InlineCode> and{" "}
-            <InlineCode>members/</InlineCode> subdirectories
+            <strong style={{ color: "var(--text-primary)" }}>子智能体</strong>{" "}
+            来自 <InlineCode>sub-agents/</InlineCode> 和{" "}
+            <InlineCode>members/</InlineCode> 子目录
           </>,
         ]}
       />
       <Paragraph>
-        If <InlineCode>$WORKSPACE_PATH/SOUL.md</InlineCode> exists, it becomes
-        the root orchestrator. If{" "}
-        <InlineCode>$WORKSPACE_PATH/IDENTITY.md</InlineCode> exists, the root
-        agent's name and emoji are read from it.
+        如果 <InlineCode>$WORKSPACE_PATH/SOUL.md</InlineCode> 存在，它将成为根协调器。如果{" "}
+        <InlineCode>$WORKSPACE_PATH/IDENTITY.md</InlineCode> 存在，根智能体的名称和 emoji 将从中读取。
       </Paragraph>
 
-      <SubHeading>Using a Custom Registry</SubHeading>
+      <SubHeading>使用自定义注册表</SubHeading>
       <Paragraph>
-        For full control over names, colors, emoji, hierarchy, and tools, create
-        a file at:
+        要完全控制名称、颜色、emoji、层级和工具，请在以下位置创建文件：
       </Paragraph>
       <CodeBlock>{`$WORKSPACE_PATH/clawport/agents.json`}</CodeBlock>
       <Paragraph>
-        ClawPort checks for this file on every request. If it exists, it
-        replaces auto-discovery entirely. If it's missing or contains invalid
-        JSON, auto-discovery is used instead.
+        ClawPort 在每次请求时检查此文件。如果存在，它将完全替换自动发现。如果缺失或包含无效 JSON，则使用自动发现。
       </Paragraph>
 
-      <SubHeading>Agent Entry Format</SubHeading>
+      <SubHeading>智能体条目格式</SubHeading>
       <CodeBlock title="agents.json">
         {`[
   {
     "id": "my-agent",
-    "name": "My Agent",
-    "title": "What this agent does",
+    "name": "我的智能体",
+    "title": "这个智能体的职责",
     "reportsTo": null,
     "directReports": [],
     "soulPath": "agents/my-agent/SOUL.md",
     "voiceId": null,
     "color": "#06b6d4",
-    "emoji": "\u{1F916}",
+    "emoji": "\\u{1F916}",
     "tools": ["read", "write"],
     "memoryPath": null,
-    "description": "One-liner about this agent."
+    "description": "关于这个智能体的一句话描述"
   }
 ]`}
       </CodeBlock>
 
-      <SubHeading>Field Reference</SubHeading>
+      <SubHeading>字段参考</SubHeading>
       <Table
-        headers={["Field", "Type", "Description"]}
+        headers={["字段", "类型", "说明"]}
         rows={[
           [
             <InlineCode key="id">id</InlineCode>,
             "string",
-            'Unique slug for the agent (e.g., "vera")',
+            "智能体的唯一标识 (例如 \"vera\")",
           ],
           [
             <InlineCode key="name">name</InlineCode>,
             "string",
-            'Display name (e.g., "VERA")',
+            "显示名称 (例如 \"VERA\")",
           ],
           [
             <InlineCode key="title">title</InlineCode>,
             "string",
-            'Role title (e.g., "Chief Strategy Officer")',
+            "职位头衔 (例如 \"首席战略官\")",
           ],
           [
             <InlineCode key="rt">reportsTo</InlineCode>,
             "string | null",
-            "Parent agent id for the org chart. null for the root.",
+            "组织图中的父智能体 ID。根节点为 null。",
           ],
           [
             <InlineCode key="dr">directReports</InlineCode>,
             "string[]",
-            "Array of child agent ids",
+            "子智能体 ID 数组",
           ],
           [
             <InlineCode key="sp">soulPath</InlineCode>,
             "string | null",
-            "Path to the agent's SOUL.md, relative to WORKSPACE_PATH",
+            "智能体 SOUL.md 的路径，相对于 WORKSPACE_PATH",
           ],
           [
             <InlineCode key="vi">voiceId</InlineCode>,
             "string | null",
-            "ElevenLabs voice ID (requires ELEVENLABS_API_KEY)",
+            "ElevenLabs 语音 ID (需要 ELEVENLABS_API_KEY)",
           ],
           [
             <InlineCode key="co">color</InlineCode>,
             "string",
-            "Hex color for the agent's node in the Org Map",
+            "组织图中智能体节点的颜色 (十六进制)",
           ],
           [
             <InlineCode key="em">emoji</InlineCode>,
             "string",
-            "Emoji shown as the agent's avatar",
+            "显示为智能体头像的 emoji",
           ],
           [
             <InlineCode key="to">tools</InlineCode>,
             "string[]",
-            "List of tools this agent has access to",
+            "此智能体有权访问的工具列表",
           ],
           [
             <InlineCode key="mp">memoryPath</InlineCode>,
             "string | null",
-            "Path to agent-specific memory (relative to WORKSPACE_PATH)",
+            "智能体专属记忆的路径 (相对于 WORKSPACE_PATH)",
           ],
           [
             <InlineCode key="de">description</InlineCode>,
             "string",
-            "One-line description shown in the UI",
+            "UI 中显示的一句话描述",
           ],
         ]}
       />
 
-      <SubHeading>Hierarchy Rules</SubHeading>
+      <SubHeading>层级规则</SubHeading>
       <BulletList
         items={[
           <>
-            Exactly one agent should have{" "}
-            <InlineCode>{"\"reportsTo\": null"}</InlineCode> -- this is your
-            root/orchestrator node.
+            恰好一个智能体应该有 <InlineCode>{"\"reportsTo\": null"}</InlineCode> —— 这是你的根/协调器节点。
           </>,
           <>
-            <InlineCode>directReports</InlineCode> should be consistent with{" "}
-            <InlineCode>reportsTo</InlineCode>. If agent B reports to agent A,
-            then A's directReports should include B's id.
+            <InlineCode>directReports</InlineCode> 应该与 <InlineCode>reportsTo</InlineCode> 一致。
+            如果智能体 B 汇报给智能体 A，那么 A 的 directReports 应该包含 B 的 id。
           </>,
-          "The Org Map uses these relationships to build the org chart automatically.",
+          "组织图使用这些关系自动构建组织架构图。",
         ]}
       />
 
-      <SubHeading>Example: Minimal Two-Agent Setup</SubHeading>
+      <SubHeading>示例：最小双智能体配置</SubHeading>
       <CodeBlock title="agents.json">
         {`[
   {
     "id": "boss",
-    "name": "Boss",
-    "title": "Orchestrator",
+    "name": "老板",
+    "title": "协调器",
     "reportsTo": null,
     "directReports": ["worker"],
     "soulPath": "SOUL.md",
     "voiceId": null,
     "color": "#f5c518",
-    "emoji": "\u{1F451}",
+    "emoji": "\\u{1F451}",
     "tools": ["read", "write", "exec", "message"],
     "memoryPath": null,
-    "description": "Top-level orchestrator."
+    "description": "顶级协调器"
   },
   {
     "id": "worker",
-    "name": "Worker",
-    "title": "Task Runner",
+    "name": "工作者",
+    "title": "任务执行者",
     "reportsTo": "boss",
     "directReports": [],
     "soulPath": "agents/worker/SOUL.md",
     "voiceId": null,
     "color": "#22c55e",
-    "emoji": "\u{2699}\u{FE0F}",
+    "emoji": "\\u{2699}\\u{FE0F}",
     "tools": ["read", "write"],
     "memoryPath": null,
-    "description": "Handles assigned tasks."
+    "description": "处理分配的任务"
   }
 ]`}
       </CodeBlock>
 
-      <SubHeading>Registry Resolution</SubHeading>
+      <SubHeading>注册表解析顺序</SubHeading>
       <NumberedList
         items={[
           <>
-            <strong style={{ color: "var(--text-primary)" }}>User override</strong>{" "}
-            -- <InlineCode>$WORKSPACE_PATH/clawport/agents.json</InlineCode> (if
-            exists and valid JSON).
+            <strong style={{ color: "var(--text-primary)" }}>用户覆盖</strong>{" "}
+            -- <InlineCode>$WORKSPACE_PATH/clawport/agents.json</InlineCode> (如果存在且为有效 JSON)。
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Auto-discovery</strong>{" "}
-            -- scans <InlineCode>$WORKSPACE_PATH/agents/</InlineCode> for
-            subdirectories with SOUL.md, sub-agents, and members.
+            <strong style={{ color: "var(--text-primary)" }}>自动发现</strong>{" "}
+            -- 扫描 <InlineCode>$WORKSPACE_PATH/agents/</InlineCode> 中包含 SOUL.md、sub-agents 和 members 的子目录。
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Bundled fallback</strong>{" "}
-            -- <InlineCode>lib/agents.json</InlineCode> (example team for demo
-            purposes).
+            <strong style={{ color: "var(--text-primary)" }}>打包回退</strong>{" "}
+            -- <InlineCode>lib/agents.json</InlineCode> (示例团队，用于演示)。
           </>,
         ]}
       />
 
       <Callout type="tip">
-        You can add a new agent without editing any source code -- just update
-        your workspace <InlineCode>agents.json</InlineCode>. The agent will
-        automatically appear in the Org Map, Chat, and Detail pages.
+        你可以无需编辑任何源代码就添加新智能体 —— 只需更新你工作空间的 <InlineCode>agents.json</InlineCode>。
+        智能体将自动出现在组织图、对话和详情页面中。
       </Callout>
 
-      <SubHeading>Agent Display Overrides</SubHeading>
+      <SubHeading>智能体显示覆盖</SubHeading>
       <Paragraph>
-        Each agent can have per-agent emoji and/or profile image overrides via
-        the Settings page. These are stored in{" "}
-        <InlineCode>ClawPortSettings.agentOverrides</InlineCode> keyed by agent ID.
-        The <InlineCode>getAgentDisplay()</InlineCode> function resolves the
-        effective visual for each agent, considering overrides.
+        每个智能体可以通过设置页面覆盖专属的 emoji 和/或头像图片。这些存储在按智能体 ID 索引的{" "}
+        <InlineCode>ClawPortSettings.agentOverrides</InlineCode> 中。<InlineCode>getAgentDisplay()</InlineCode> 函数 
+        考虑覆盖因素后解析每个智能体的有效视觉显示。
       </Paragraph>
     </>
   );

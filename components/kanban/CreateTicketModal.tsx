@@ -29,9 +29,9 @@ interface CreateTicketModalProps {
 
 const PRIORITIES: TicketPriority[] = ['low', 'medium', 'high']
 const PRIORITY_LABELS: Record<TicketPriority, string> = {
-  low: 'Low',
-  medium: 'Medium',
-  high: 'High',
+  low: '低',
+  medium: '中',
+  high: '高',
 }
 
 const ROLES: TeamRole[] = ['lead-dev', 'ux-ui', 'qa']

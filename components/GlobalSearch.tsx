@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import type { CronJob } from '@/lib/types';
 import { useAgentsContext } from '@/app/agents-provider';
+import { i18n } from '@/lib/i18n';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -33,11 +34,11 @@ interface SearchResult {
 // ---------------------------------------------------------------------------
 
 const STATIC_PAGES: SearchResult[] = [
-  { id: 'page-map', label: 'Map', icon: <Map size={16} />, href: '/', category: 'Pages' },
-  { id: 'page-messages', label: 'Messages', icon: <MessageSquare size={16} />, href: '/chat', category: 'Pages' },
-  { id: 'page-crons', label: 'Crons', icon: <Clock size={16} />, href: '/crons', category: 'Pages' },
-  { id: 'page-memory', label: 'Memory', icon: <Brain size={16} />, href: '/memory', category: 'Pages' },
-  { id: 'page-settings', label: 'Settings', icon: <Settings size={16} />, href: '/settings', category: 'Pages' },
+  { id: 'page-map', label: i18n.nav.items.home, icon: <Map size={16} />, href: '/', category: 'Pages' },
+  { id: 'page-messages', label: i18n.nav.items.chat, icon: <MessageSquare size={16} />, href: '/chat', category: 'Pages' },
+  { id: 'page-crons', label: i18n.nav.items.crons, icon: <Clock size={16} />, href: '/crons', category: 'Pages' },
+  { id: 'page-memory', label: i18n.nav.items.memory, icon: <Brain size={16} />, href: '/memory', category: 'Pages' },
+  { id: 'page-settings', label: i18n.nav.items.settings, icon: <Settings size={16} />, href: '/settings', category: 'Pages' },
 ];
 
 // ---------------------------------------------------------------------------
@@ -84,7 +85,7 @@ export function SearchTrigger({ onClick }: { onClick: () => void }) {
       }}
     >
       <Search size={14} style={{ flexShrink: 0, opacity: 0.7 }} />
-      <span style={{ flex: 1, textAlign: 'left' }}>Search...</span>
+      <span style={{ flex: 1, textAlign: 'left' }}>{i18n.common.search}...</span>
       <kbd
         style={{
           fontSize: '11px',
@@ -377,7 +378,7 @@ export function GlobalSearch() {
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search ClawPort..."
+            placeholder={`${i18n.common.search} ClawPort...`}
             aria-label="Search ClawPort"
             style={{
               flex: 1,

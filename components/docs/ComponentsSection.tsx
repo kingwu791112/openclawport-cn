@@ -8,18 +8,18 @@ import {
   BulletList,
   InfoCard,
 } from "./DocSection";
+import { docs } from "@/lib/i18n-docs";
 
 export function ComponentsSection() {
+  const comp = docs.components;
   return (
     <>
-      <Heading>Components</Heading>
+      <Heading>{comp.title}</Heading>
       <Paragraph>
-        ClawPort's component tree follows the standard Next.js App Router
-        pattern: providers wrap the entire app, layout components handle the
-        sidebar and navigation, and each route renders its own page component.
+        ClawPort 的组件树遵循标准的 Next.js App Router 模式：providers 包裹整个应用，layout 组件处理侧边栏和导航，每个路由渲染自己的页面组件。
       </Paragraph>
 
-      <SubHeading>Component Tree</SubHeading>
+      <SubHeading>组件树</SubHeading>
       <CodeBlock>
         {`RootLayout (app/layout.tsx)
   ThemeProvider (app/providers.tsx)
@@ -31,8 +31,8 @@ export function ComponentsSection() {
         ThemeToggle
         MobileSidebar
         GlobalSearch
-      <main> (page content)
-        HomePage ............. / (org chart, grid, feed)
+      <main> (页面内容)
+        HomePage ............. / (组织图、网格、动态)
           OrgMap (React Flow)
             AgentNode
               AgentAvatar
@@ -65,17 +65,17 @@ export function ComponentsSection() {
         <BulletList
           items={[
             <>
-              <strong style={{ color: "var(--text-primary)" }}>File:</strong>{" "}
+              <strong style={{ color: "var(--text-primary)" }}>文件:</strong>{" "}
               <InlineCode>app/providers.tsx</InlineCode>
             </>,
-            "Manages the active theme and applies it via data-theme attribute on <html>",
+            "管理活动主题并通过 <html> 上的 data-theme 属性应用",
             <>
-              Consumer hook:{" "}
+              消费 Hook:{" "}
               <InlineCode>{"const { theme, setTheme } = useTheme()"}</InlineCode>
             </>,
             <>
-              Persists to <InlineCode>localStorage('clawport-theme')</InlineCode>,
-              defaults to 'dark'
+              持久化到 <InlineCode>localStorage('clawport-theme')</InlineCode>，
+              默认为 'dark'
             </>,
           ]}
         />
@@ -85,163 +85,162 @@ export function ComponentsSection() {
         <BulletList
           items={[
             <>
-              <strong style={{ color: "var(--text-primary)" }}>File:</strong>{" "}
+              <strong style={{ color: "var(--text-primary)" }}>文件:</strong>{" "}
               <InlineCode>app/settings-provider.tsx</InlineCode>
             </>,
-            "Central state management for all user-configurable settings",
+            "所有用户可配置设置的中心状态管理",
             <>
-              Consumer hook:{" "}
+              消费 Hook:{" "}
               <InlineCode>{"const { settings, setAccentColor, ... } = useSettings()"}</InlineCode>
             </>,
-            "Applies accent color CSS variables directly to document.documentElement",
+            "直接将强调色 CSS 变量应用到 document.documentElement",
             <>
-              Persists to{" "}
+              持久化到{" "}
               <InlineCode>localStorage('clawport-settings')</InlineCode>
             </>,
           ]}
         />
       </InfoCard>
 
-      <SubHeading>Layout Components</SubHeading>
+      <SubHeading>布局组件</SubHeading>
       <Table
-        headers={["Component", "File", "Purpose"]}
+        headers={["组件", "文件", "用途"]}
         rows={[
           [
             "Sidebar",
             <InlineCode key="s">components/Sidebar.tsx</InlineCode>,
-            "Desktop sidebar wrapper. Renders NavLinks, ThemeToggle, MobileSidebar, GlobalSearch.",
+            "桌面端侧边栏包装器。渲染 NavLinks、ThemeToggle、MobileSidebar、GlobalSearch。",
           ],
           [
             "NavLinks",
             <InlineCode key="n">components/NavLinks.tsx</InlineCode>,
-            "Sidebar nav links with icons, badges, and operator identity footer.",
+            "带图标、徽章和操作员身份底部的侧边栏导航链接。",
           ],
           [
             "MobileSidebar",
             <InlineCode key="m">components/MobileSidebar.tsx</InlineCode>,
-            "Fixed mobile header bar with hamburger menu and slide-out sidebar panel.",
+            "带汉堡菜单和滑出侧边栏面板的固定移动端顶部栏。",
           ],
           [
             "GlobalSearch",
             <InlineCode key="g">components/GlobalSearch.tsx</InlineCode>,
-            "Cmd+K search palette with fuzzy search across agents, pages, and crons.",
+            "Cmd+K 搜索面板，支持智能模糊搜索智能体、页面和定时任务。",
           ],
           [
             "ThemeToggle",
             <InlineCode key="t">components/ThemeToggle.tsx</InlineCode>,
-            "Theme selector rendered as a row of emoji buttons with radiogroup semantics.",
+            "主题选择器，渲染为一行 emoji 按钮，具有 radiogroup 语义。",
           ],
         ]}
       />
 
-      <SubHeading>Chat Components</SubHeading>
+      <SubHeading>聊天组件</SubHeading>
       <Table
-        headers={["Component", "Purpose"]}
+        headers={["组件", "用途"]}
         rows={[
           [
             "ConversationView",
-            "Main chat: messages, SSE streaming, file attachments, TTS playback, voice recording, markdown rendering.",
+            "主聊天：消息、SSE 流式传输、文件附件、TTS 播放、语音录制、markdown 渲染。",
           ],
           [
             "AgentList",
-            "Agent selection sidebar for chat. Desktop (300px fixed) and mobile (full-width) variants.",
+            "聊天的智能体选择侧边栏。桌面端（固定 300px）和移动端（全宽）变体。",
           ],
           [
             "VoiceMessage",
-            "Audio waveform playback with play/pause toggle and animated progress bars.",
+            "带播放/暂停切换和动画进度条的音频波形播放。",
           ],
           [
             "FileAttachment",
-            "File attachment bubble with type-specific icon and download button.",
+            "带类型特定图标和下载按钮的文件附件气泡。",
           ],
           [
             "MediaPreview",
-            "Horizontal strip of staged attachment thumbnails before sending.",
+            "发送前已暂存附件缩略图的水平条带。",
           ],
         ]}
       />
 
-      <SubHeading>Map Components</SubHeading>
+      <SubHeading>地图组件</SubHeading>
       <Table
-        headers={["Component", "Purpose"]}
+        headers={["组件", "用途"]}
         rows={[
           [
             "OrgMap",
-            "React Flow org chart with BFS-based hierarchical layout, edge highlighting, and interactive zoom.",
+            "React Flow 组织图，基于 BFS 的层级布局，边高亮，交互式缩放。",
           ],
           [
             "AgentNode",
-            "Custom React Flow node: avatar, name, title, cron health indicator, selection state.",
+            "自定义 React Flow 节点：头像、名称、头衔、定时任务健康指示器、选中状态。",
           ],
           [
             "GridView",
-            "Card-based grid with team grouping hierarchy. Responsive: 1/2/3 columns.",
+            "带团队分组层级的卡片网格。响应式：1/2/3 列。",
           ],
           [
             "FeedView",
-            "Activity feed focused on cron status with stat cards and filter pills.",
+            "专注于定时任务状态的动态流，带统计卡片和筛选标签。",
           ],
         ]}
       />
 
-      <SubHeading>Kanban Components</SubHeading>
+      <SubHeading>看板组件</SubHeading>
       <Table
-        headers={["Component", "Purpose"]}
+        headers={["组件", "用途"]}
         rows={[
           [
             "KanbanBoard",
-            "Four-column board (Backlog, In Progress, Review, Done) with agent filter.",
+            "四列看板（待处理、进行中、审核中、已完成），带智能体筛选。",
           ],
           [
             "KanbanColumn",
-            "Single column with HTML5 drag-and-drop support and drop zone highlight.",
+            "单列，支持 HTML5 拖放，带放置区域高亮。",
           ],
           [
             "TicketCard",
-            "Draggable card: priority dot, title, agent avatar, work state indicator.",
+            "可拖放卡片：优先级点、标题、智能体头像、工作状态指示器。",
           ],
           [
             "TicketDetailPanel",
-            "Slide-in side panel for ticket details and inline agent chat.",
+            "滑入侧边面板，显示工单详情和内联智能体聊天。",
           ],
           [
             "CreateTicketModal",
-            "Modal for creating tickets with title, description, priority, agent assignment.",
+            "创建工单模态框，包含标题、描述、优先级、智能体分配。",
           ],
         ]}
       />
 
-      <SubHeading>Other Key Components</SubHeading>
+      <SubHeading>其他关键组件</SubHeading>
       <Table
-        headers={["Component", "Purpose"]}
+        headers={["组件", "用途"]}
         rows={[
           [
             "OnboardingWizard",
-            "5-step first-run setup wizard (name, theme, accent, voice, overview). Re-runnable from Settings.",
+            "5 步首次运行设置向导（名称、主题、强调色、语音、概览）。可从设置重新运行。",
           ],
           [
             "AgentAvatar",
-            "Agent avatar: profile image, emoji on colored background, or emoji-only mode.",
+            "智能体头像：个人资料图片、彩色背景上的 emoji，或仅 emoji 模式。",
           ],
           [
             "DynamicFavicon",
-            "Generates favicon from portal emoji/icon using Canvas API.",
+            "使用 Canvas API 从门户 emoji/图标生成 favicon。",
           ],
           [
             "ErrorState",
-            "Full-screen error display with optional retry button.",
+            "带可选重试按钮的全屏错误显示。",
           ],
           [
             "Breadcrumbs",
-            "Breadcrumb navigation bar with Lucide ChevronRight separators.",
+            "带 Lucide ChevronRight 分隔符的面包屑导航栏。",
           ],
         ]}
       />
 
-      <SubHeading>UI Primitives</SubHeading>
+      <SubHeading>UI 原语</SubHeading>
       <Paragraph>
-        Radix-based primitive components in{" "}
-        <InlineCode>components/ui/</InlineCode> (shadcn/ui-style wrappers):
+        <InlineCode>components/ui/</InlineCode> 中的 Radix 原语组件（shadcn/ui 风格包装器）：
       </Paragraph>
       <BulletList
         items={[

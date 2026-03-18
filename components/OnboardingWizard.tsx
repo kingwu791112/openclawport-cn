@@ -7,6 +7,7 @@ import { useTheme } from '@/app/providers'
 import { THEMES } from '@/lib/themes'
 import type { ThemeId } from '@/lib/themes'
 import { fetchOnboarded, syncOnboarded } from '@/lib/conversations'
+import { i18n } from '@/lib/i18n'
 
 // ---------------------------------------------------------------------------
 // Accent color presets (same as settings page)
@@ -296,9 +297,8 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 margin: '0 auto',
                 marginBottom: 'var(--space-5)',
               }}>
-                A visual command centre for your AI agent team.
-                Built to give you direct, real-time access to every agent
-                in your OpenClaw workspace.
+                你的 AI 智能体团队的可视化指挥中心。
+                让你能够直接、实时地访问 OpenClaw 工作空间中的每个智能体。
               </p>
 
               <div style={{
@@ -308,9 +308,9 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 textAlign: 'left',
               }}>
                 {[
-                  { emoji: '🗺️', title: 'Map & Chat', desc: 'Interactive agent org chart with direct messaging' },
-                  { emoji: '⚡', title: 'Monitor', desc: 'Cron jobs, shared memory, and task management' },
-                  { emoji: '🎨', title: 'Personalize', desc: 'Five themes, accent colors, and custom branding' },
+                  { emoji: '🗺️', title: '地图与聊天', desc: '交互式智能体组织图，支持直接消息对话' },
+                  { emoji: '⚡', title: '监控', desc: '定时任务、共享记忆和任务管理' },
+                  { emoji: '🎨', title: '个性化', desc: '五种主题、强调色和自定义品牌' },
                 ].map(item => (
                   <div
                     key={item.title}
@@ -365,17 +365,17 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 color: 'var(--text-primary)',
                 marginBottom: 'var(--space-1)',
               }}>
-                System Check
+                系统检查
               </h2>
               <p style={{
                 fontSize: 'var(--text-subheadline)',
                 color: 'var(--text-tertiary)',
                 marginBottom: 'var(--space-4)',
               }}>
-                Verifying your OpenClaw connection...
+                正在验证 OpenClaw 连接...
               </p>
 
-              {/* Your Name input */}
+              {/* 你的名字 input */}
               <div style={{ marginBottom: 'var(--space-4)' }}>
                 <label style={{
                   display: 'block',
@@ -383,12 +383,12 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                   color: 'var(--text-tertiary)',
                   marginBottom: 'var(--space-1)',
                 }}>
-                  Your Name
+                  你的名字
                 </label>
                 <input
                   type="text"
                   className="apple-input"
-                  placeholder="Your Name"
+                  placeholder="你的名字"
                   value={localOperator}
                   onChange={e => setLocalOperator(e.target.value)}
                   style={{
@@ -736,14 +736,14 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 color: 'var(--text-primary)',
                 marginBottom: 'var(--space-1)',
               }}>
-                Choose a Theme
+                选择主题
               </h2>
               <p style={{
                 fontSize: 'var(--text-subheadline)',
                 color: 'var(--text-tertiary)',
                 marginBottom: 'var(--space-4)',
               }}>
-                Pick the look that suits you. This applies live.
+                挑选你喜欢的样式。实时生效。
               </p>
 
               <div style={{
@@ -795,14 +795,14 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 color: 'var(--text-primary)',
                 marginBottom: 'var(--space-1)',
               }}>
-                Accent Color
+                强调色
               </h2>
               <p style={{
                 fontSize: 'var(--text-subheadline)',
                 color: 'var(--text-tertiary)',
                 marginBottom: 'var(--space-4)',
               }}>
-                Personalize with your favorite color.
+                用你喜欢的颜色来个性化。
               </p>
 
               <div style={{
@@ -852,7 +852,7 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 color: 'var(--text-primary)',
                 marginBottom: 'var(--space-1)',
               }}>
-                Voice Input
+                语音输入
               </h2>
               <p style={{
                 fontSize: 'var(--text-subheadline)',
@@ -860,8 +860,8 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 marginBottom: 'var(--space-4)',
                 lineHeight: 'var(--leading-relaxed)',
               }}>
-                Talk to your agents using your system&apos;s built-in dictation.
-                No microphone setup needed in the browser.
+                使用系统内置的语音识别与智能体对话。
+                无需在浏览器中设置麦克风。
               </p>
 
               <div style={{
@@ -966,14 +966,14 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
                 color: 'var(--text-primary)',
                 marginBottom: 'var(--space-1)',
               }}>
-                You&apos;re All Set
+                准备就绪
               </h2>
               <p style={{
                 fontSize: 'var(--text-subheadline)',
                 color: 'var(--text-tertiary)',
                 marginBottom: 'var(--space-4)',
               }}>
-                Here&apos;s what you can do.
+                以下是你可以做的事情。
               </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--space-2)' }}>
@@ -1077,7 +1077,7 @@ export function OnboardingWizard({ forceOpen, onClose }: OnboardingWizardProps) 
               gap: 6,
             }}
           >
-            {step === 0 ? 'Begin' : step === TOTAL_STEPS - 1 ? 'Get Started' : 'Next'}
+            {step === 0 ? '开始' : step === TOTAL_STEPS - 1 ? '开始使用' : '下一步'}
             {step === TOTAL_STEPS - 1 ? <Rocket size={16} /> : <ArrowRight size={16} />}
           </button>
         </div>

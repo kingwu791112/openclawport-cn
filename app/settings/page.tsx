@@ -8,6 +8,7 @@ import { useAgentsContext } from '@/app/agents-provider'
 import { AgentAvatar } from '@/components/AgentAvatar'
 import { OnboardingWizard } from '@/components/OnboardingWizard'
 import { deleteOnServer } from '@/lib/conversations'
+import { i18n } from '@/lib/i18n'
 
 // ---------------------------------------------------------------------------
 // Accent color presets
@@ -150,7 +151,7 @@ export default function SettingsPage() {
               padding: '0 var(--space-4) var(--space-2)',
             }}
           >
-            Accent Color
+            {i18n.settings.accentColor}
           </div>
           <div
             style={{
@@ -913,7 +914,7 @@ export default function SettingsPage() {
               }}
             >
               <RefreshCw size={16} className={agentsLoading ? 'animate-spin' : ''} />
-              {rescanResult || 'Rescan Agents'}
+              {rescanResult || i18n.settings.rescanAgents}
             </button>
             <button
               onClick={() => {
@@ -938,19 +939,19 @@ export default function SettingsPage() {
               }}
             >
               <Trash2 size={16} />
-              Reset All Settings
+              {i18n.settings.resetAll}
             </button>
             <button
               onClick={async () => {
-                if (!window.confirm('Delete all server-side conversation data?')) return
+                if (!window.confirm(i18n.settings.confirmDelete)) return
                 try {
                   const res = await fetch('/api/conversations')
                   if (!res.ok) throw new Error()
                   const ids: string[] = await res.json()
                   ids.forEach(id => deleteOnServer(id))
-                  alert('Cleared')
+                  alert(i18n.settings.cleared)
                 } catch {
-                  alert('Failed to clear server data')
+                  alert(i18n.settings.failedClear)
                 }
               }}
               className="btn-scale"

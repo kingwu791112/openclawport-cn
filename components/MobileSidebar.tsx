@@ -8,6 +8,7 @@ import { ThemeToggle } from '@/components/ThemeToggle';
 import { SearchTrigger } from '@/components/GlobalSearch';
 import { useSettings } from '@/app/settings-provider';
 import { SidebarUsageWidget } from '@/components/sidebar/SidebarUsageWidget';
+import { i18n } from '@/lib/i18n';
 
 export function MobileSidebar({
   onOpenSearch,
@@ -76,7 +77,7 @@ export function MobileSidebar({
         <button
           onClick={toggle}
           className="btn-ghost focus-ring"
-          aria-label={open ? 'Close navigation menu' : 'Open navigation menu'}
+          aria-label={open ? i18n.common.closeNav : i18n.common.openNav}
           aria-expanded={open}
           style={{
             width: '36px',

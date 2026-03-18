@@ -108,9 +108,9 @@ const VIEW_ICONS: Record<View, React.ComponentType<{ size: number }>> = {
 }
 
 const VIEW_OPTIONS: { key: View; label: string }[] = [
-  { key: "map", label: "Map" },
-  { key: "grid", label: "Grid" },
-  { key: "feed", label: "Feed" },
+  { key: "map", label: "地图" },
+  { key: "grid", label: "网格" },
+  { key: "feed", label: "动态" },
 ]
 
 /* ──────────────────────────────────────────────

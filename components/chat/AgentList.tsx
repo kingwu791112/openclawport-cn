@@ -4,6 +4,7 @@ import type { Agent } from '@/lib/types'
 import type { ConversationStore } from '@/lib/conversations'
 import { Skeleton } from '@/components/ui/skeleton'
 import { AgentAvatar } from '@/components/AgentAvatar'
+import { i18n } from '@/lib/i18n'
 
 interface AgentListProps {
   agents: Agent[]
@@ -158,7 +159,7 @@ export function AgentList({ agents, conversations, activeId, onSelect, loading }
               color: 'var(--text-tertiary)',
               lineHeight: 'var(--leading-relaxed)',
             }}>
-              No agents match &lsquo;{search.trim()}&rsquo;
+              {i18n.chat.noAgentsMatch} '{search.trim()}';
             </div>
           </div>
         ) : (
@@ -408,7 +409,7 @@ export function AgentListMobile({
               color: 'var(--text-tertiary)',
               lineHeight: 'var(--leading-relaxed)',
             }}>
-              No agents match &lsquo;{search.trim()}&rsquo;
+              {i18n.chat.noAgentsMatch} '{search.trim()}';
             </div>
           </div>
         ) : (

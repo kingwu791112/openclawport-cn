@@ -26,10 +26,10 @@ const STATUS_DOT: Record<string, string> = {
 };
 
 const PILLS: { key: Filter; label: string; dotColor: string }[] = [
-  { key: "all", label: "All", dotColor: "var(--text-primary)" },
-  { key: "ok", label: "OK", dotColor: "var(--system-green)" },
-  { key: "error", label: "Errors", dotColor: "var(--system-red)" },
-  { key: "idle", label: "Idle", dotColor: "var(--text-tertiary)" },
+  { key: "all", label: "全部", dotColor: "var(--text-primary)" },
+  { key: "ok", label: "正常", dotColor: "var(--system-green)" },
+  { key: "error", label: "错误", dotColor: "var(--system-red)" },
+  { key: "idle", label: "空闲", dotColor: "var(--text-tertiary)" },
 ];
 
 const TAB_ICONS: Record<Tab, React.ComponentType<{ size: number; className?: string }>> = {
@@ -39,9 +39,9 @@ const TAB_ICONS: Record<Tab, React.ComponentType<{ size: number; className?: str
 };
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: "overview", label: "Overview" },
-  { key: "schedule", label: "Schedule" },
-  { key: "pipelines", label: "Pipelines" },
+  { key: "overview", label: "概览" },
+  { key: "schedule", label: "计划" },
+  { key: "pipelines", label: "流水线" },
 ];
 
 /* ─── Delivery helpers ─────────────────────────────────────────── */
@@ -50,7 +50,7 @@ function DeliveryBadge({ cron }: { cron: CronJob }) {
   if (!cron.delivery) {
     return (
       <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>
-        No delivery configured
+        未配置投递
       </span>
     );
   }
@@ -69,7 +69,7 @@ function DeliveryBadge({ cron }: { cron: CronJob }) {
   const isDelivered = lastDeliveryStatus === "delivered";
   const isUnknown = !lastDeliveryStatus || lastDeliveryStatus === "unknown";
   const color = isDelivered ? "var(--system-green)" : isUnknown ? "var(--system-orange)" : "var(--system-orange)";
-  const statusText = isDelivered ? "Delivered" : isUnknown ? "Unknown" : lastDeliveryStatus;
+  const statusText = isDelivered ? "已投递" : isUnknown ? "未知" : lastDeliveryStatus;
 
   // Truncate the "to" field for display
   const toDisplay = delivery.to && delivery.to.length > 20
@@ -239,7 +239,7 @@ function ErrorsBanners({
           }}
         >
           <div style={{ fontSize: "var(--text-footnote)", color: "var(--system-red)", fontWeight: "var(--weight-semibold)", marginBottom: "var(--space-2)" }}>
-            {execErrors.length} execution error{execErrors.length !== 1 ? "s" : ""}
+            {execErrors.length} 个执行错误
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: "var(--space-2)" }}>
             {execErrors.map((cron) => {
@@ -326,7 +326,7 @@ function RecentRuns({ jobId }: { jobId: string }) {
     return (
       <div style={{ marginTop: "var(--space-3)" }}>
         <div style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)", fontWeight: "var(--weight-semibold)", marginBottom: "var(--space-2)" }}>
-          Recent Runs
+          最近运行
         </div>
         {[1, 2, 3].map(i => (
           <Skeleton key={i} style={{ height: 16, marginBottom: 4, width: "80%" }} />
@@ -339,9 +339,9 @@ function RecentRuns({ jobId }: { jobId: string }) {
     return (
       <div style={{ marginTop: "var(--space-3)" }}>
         <div style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)", fontWeight: "var(--weight-semibold)", marginBottom: "var(--space-2)" }}>
-          Recent Runs
+          最近运行
         </div>
-        <div style={{ fontSize: "var(--text-caption2)", color: "var(--text-tertiary)" }}>No run history</div>
+        <div style={{ fontSize: "var(--text-caption2)", color: "var(--text-tertiary)" }}>暂无运行记录</div>
       </div>
     );
   }
@@ -349,14 +349,14 @@ function RecentRuns({ jobId }: { jobId: string }) {
   return (
     <div style={{ marginTop: "var(--space-3)" }}>
       <div style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)", fontWeight: "var(--weight-semibold)", marginBottom: "var(--space-2)" }}>
-        Recent Runs
+        最近运行
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         {runs.map((run, i) => {
           const statusDot = run.status === "ok" ? "var(--system-green)" : "var(--system-red)";
           const ago = timeAgo(new Date(run.ts).toISOString());
           const duration = formatDuration(run.durationMs);
-          const deliveryStat = run.deliveryStatus === "delivered" ? "Delivered" : run.deliveryStatus === "unknown" ? "Unknown" : run.deliveryStatus || "—";
+          const deliveryStat = run.deliveryStatus === "delivered" ? "已投递" : run.deliveryStatus === "unknown" ? "未知" : run.deliveryStatus || "—";
           const summaryText = run.status === "error" ? (run.error || "Error") : (run.summary || "—");
           const truncatedSummary = summaryText.length > 60 ? summaryText.slice(0, 57) + "..." : summaryText;
 
@@ -720,11 +720,11 @@ export default function CronsPage() {
                                 )}
 
                                 {/* Last run */}
-                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>Last run</span>
-                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-secondary)" }}>{timeAgo(cron.lastRun)}</span>
+                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>上次运行</span>
+                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-secondary)" }}>{cron.lastRun ? timeAgo(new Date(cron.lastRun).toISOString()) : "—"}</span>
 
                                 {/* Next run */}
-                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>Next run</span>
+                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>下次运行</span>
                                 <span style={{ fontSize: "var(--text-caption1)", color: isOverdue ? "var(--system-orange)" : "var(--text-secondary)", fontWeight: isOverdue ? "var(--weight-semibold)" : undefined }}>
                                   {nextRunLabel(cron.nextRun)}
                                 </span>
@@ -738,13 +738,13 @@ export default function CronsPage() {
                                 )}
 
                                 {/* Status */}
-                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>Status</span>
+                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>状态</span>
                                 <span style={{ fontSize: "var(--text-caption1)", color: cron.status === "error" ? "var(--system-red)" : cron.status === "ok" ? "var(--system-green)" : "var(--text-secondary)", fontWeight: "var(--weight-medium)", textTransform: "capitalize" }}>
-                                  {cron.status}
+                                  {cron.status === 'ok' ? '正常' : cron.status === 'error' ? '错误' : cron.status}
                                 </span>
 
                                 {/* Schedule */}
-                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>Schedule</span>
+                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>计划</span>
                                 <div>
                                   {cron.scheduleDescription && (
                                     <div style={{ fontSize: "var(--text-caption1)", color: "var(--text-secondary)" }}>{cron.scheduleDescription}</div>
@@ -756,15 +756,15 @@ export default function CronsPage() {
                                 </div>
 
                                 {/* Delivery */}
-                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>Delivery</span>
+                                <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>投递</span>
                                 <DeliveryBadge cron={cron} />
 
                                 {/* Consecutive errors */}
                                 {cron.consecutiveErrors > 0 && (
                                   <>
-                                    <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>Errors</span>
+                                    <span style={{ fontSize: "var(--text-caption1)", color: "var(--text-tertiary)" }}>错误</span>
                                     <span style={{ fontSize: "var(--text-caption1)", color: "var(--system-orange)", fontWeight: "var(--weight-medium)" }}>
-                                      {cron.consecutiveErrors} consecutive
+                                      {cron.consecutiveErrors} 次连续错误
                                     </span>
                                   </>
                                 )}

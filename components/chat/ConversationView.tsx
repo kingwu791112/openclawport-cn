@@ -12,6 +12,7 @@ import type { SlashCommand } from '@/lib/slash-commands'
 import { FileAttachment } from './FileAttachment'
 import { MediaPreview } from './MediaPreview'
 import { AgentAvatar } from '@/components/AgentAvatar'
+import { i18n } from '@/lib/i18n'
 
 interface ConversationViewProps {
   agent: Agent
@@ -85,9 +86,9 @@ function CodeBlock({ code, keyProp }: { code: string; keyProp: number }) {
       <button
         className="code-copy-btn focus-ring"
         onClick={handleCopy}
-        aria-label="Copy code"
+        aria-label={i18n.chat.copyCode}
       >
-        {copied ? 'Copied!' : 'Copy'}
+        {copied ? i18n.chat.messageCopied : i18n.chat.copyText}
       </button>
       <pre><code>{code}</code></pre>
     </div>
@@ -680,7 +681,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
           <button
             className="md:hidden btn-ghost focus-ring"
             onClick={onBack}
-            aria-label="Back to agents"
+            aria-label={i18n.chat.backToAgents}
             style={{
               padding: 'var(--space-1) var(--space-2)',
               borderRadius: 'var(--radius-sm)',
@@ -734,7 +735,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
         <div style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-1)' }}>
           <button
             className="btn-ghost focus-ring"
-            aria-label="View agent profile"
+            aria-label={i18n.chat.viewAgentProfile}
             onClick={() => router.push(`/agents/${agent.id}`)}
             style={{
               padding: 'var(--space-2)',
@@ -752,7 +753,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
           </button>
           <button
             className="btn-ghost focus-ring"
-            aria-label="Clear conversation"
+            aria-label={i18n.chat.clearConversation}
             onClick={clearChat}
             style={{
               padding: 'var(--space-2)',
@@ -1071,7 +1072,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
             {/* Attach button */}
             <button
               className="btn-ghost focus-ring"
-              aria-label="Attach file"
+              aria-label={i18n.chat.attachFile}
               onClick={() => fileInputRef.current?.click()}
               style={{
                 padding: 'var(--space-1)',
@@ -1112,7 +1113,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
               }}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
-              placeholder={`Message ${agent.name}...`}
+              placeholder={`${i18n.chat.placeholder} ${agent.name}...`}
               rows={1}
               disabled={isStreaming}
               style={{
@@ -1141,7 +1142,7 @@ export function ConversationView({ agent, conversation, onUpdate, onBack }: Conv
               className="focus-ring"
               onClick={() => sendMessage()}
               disabled={!hasContent || isStreaming}
-              aria-label="Send message"
+              aria-label={i18n.chat.send}
               style={{
                 width: 32,
                 height: 32,

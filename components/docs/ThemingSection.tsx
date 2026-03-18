@@ -10,245 +10,230 @@ import {
   Callout,
   InfoCard,
 } from "./DocSection";
+import { docs } from "@/lib/i18n-docs";
 
 export function ThemingSection() {
+  const theme = docs.theming;
   return (
     <>
-      <Heading>Theming</Heading>
+      <Heading>{theme.title}</Heading>
       <Paragraph>
-        ClawPort's visual theming is driven entirely by CSS custom properties
-        and two React context providers: ThemeProvider and SettingsProvider.
-        Five built-in themes are toggled via the sidebar theme picker.
+        ClawPort 的视觉主题完全由 CSS 自定义属性和两个 React Context Provider 驱动：ThemeProvider 和 SettingsProvider。
+        五个内置主题通过侧边栏主题选择器切换。
       </Paragraph>
 
-      <SubHeading>Available Themes</SubHeading>
+      <SubHeading>可用主题</SubHeading>
       <Table
-        headers={["ID", "Label", "Description"]}
+        headers={["ID", "标签", "说明"]}
         rows={[
           [
             <InlineCode key="d">dark</InlineCode>,
-            "Dark",
-            "Apple Dark Mode. The default theme.",
+            "深色",
+            "Apple 深色模式。默认主题。",
           ],
           [
             <InlineCode key="g">glass</InlineCode>,
-            "Glass",
-            "Frosted glass dark variant with translucent surfaces.",
+            "毛玻璃",
+            "带半透明表面的毛玻璃深色变体。",
           ],
           [
             <InlineCode key="c">color</InlineCode>,
-            "Color",
-            "Vibrant purple-indigo variant.",
+            "彩色",
+            "充满活力的紫靛色变体。",
           ],
           [
             <InlineCode key="l">light</InlineCode>,
-            "Light",
-            "Apple Light Mode.",
+            "浅色",
+            "Apple 浅色模式。",
           ],
           [
             <InlineCode key="s">system</InlineCode>,
-            "System",
-            "Follows the OS prefers-color-scheme setting.",
+            "跟随系统",
+            "跟随操作系统偏好配色方案设置。",
           ],
         ]}
       />
 
-      <SubHeading>Three-Layer System</SubHeading>
+      <SubHeading>三层系统</SubHeading>
       <NumberedList
         items={[
           <>
             <strong style={{ color: "var(--text-primary)" }}>
-              data-theme attribute on &lt;html&gt;
+              &lt;html&gt; 上的 data-theme 属性
             </strong>{" "}
-            -- Each theme defines a CSS rule block scoped to{" "}
-            <InlineCode>[data-theme="id"]</InlineCode>. The dark theme also
-            matches <InlineCode>:root</InlineCode>.
+            -- 每个主题定义一个作用域为 <InlineCode>[data-theme="id"]</InlineCode> 的 CSS 规则块。
+            深色主题也匹配 <InlineCode>:root</InlineCode>。
           </>,
           <>
             <strong style={{ color: "var(--text-primary)" }}>
-              CSS custom properties
+              CSS 自定义属性
             </strong>{" "}
-            -- Every color, shadow, radius, and material is expressed as a CSS
-            variable. Components consume these via inline styles. No Tailwind
-            color classes are used directly.
+            -- 每个颜色、阴影、圆角和材质都表示为一个 CSS 变量。组件通过内联样式使用这些变量。
+            不直接使用 Tailwind 颜色类。
           </>,
           <>
             <strong style={{ color: "var(--text-primary)" }}>
               ThemeProvider
             </strong>{" "}
-            (<InlineCode>app/providers.tsx</InlineCode>) -- React context that
-            manages theme state, reads/writes localStorage, and sets the
-            data-theme attribute on &lt;html&gt;.
+            (<InlineCode>app/providers.tsx</InlineCode>) -- 管理主题状态的 React Context，
+            读写 localStorage，并在 &lt;html&gt; 上设置 data-theme 属性。
           </>,
         ]}
       />
 
-      <SubHeading>CSS Custom Properties</SubHeading>
+      <SubHeading>CSS 自定义属性</SubHeading>
 
-      <InfoCard title="Backgrounds">
+      <InfoCard title="背景色">
         <Table
-          headers={["Token", "Purpose", "Dark Example"]}
+          headers={["Token", "用途", "深色示例"]}
           rows={[
-            [<InlineCode key="b">--bg</InlineCode>, "Primary page background", "#000000"],
+            [<InlineCode key="b">--bg</InlineCode>, "主要页面背景", "#000000"],
             [
               <InlineCode key="bs">--bg-secondary</InlineCode>,
-              "Card / surface background",
+              "卡片 / 表面背景",
               "rgba(28,28,30,1)",
             ],
             [
               <InlineCode key="bt">--bg-tertiary</InlineCode>,
-              "Nested surface",
+              "嵌套表面",
               "rgba(44,44,46,1)",
             ],
           ]}
         />
       </InfoCard>
 
-      <InfoCard title="Materials (Apple translucent surfaces)">
+      <InfoCard title="材质（Apple 半透明表面）">
         <Table
-          headers={["Token", "Purpose"]}
+          headers={["Token", "用途"]}
           rows={[
             [
               <InlineCode key="mr">--material-regular</InlineCode>,
-              "Standard material (sidebar, overlays)",
+              "标准材质（侧边栏、浮层）",
             ],
             [
               <InlineCode key="mt">--material-thick</InlineCode>,
-              "Dense material",
+              "浓密材质",
             ],
             [
               <InlineCode key="mn">--material-thin</InlineCode>,
-              "Light tint material",
+              "浅色着色材质",
             ],
             [
               <InlineCode key="mu">--material-ultra-thin</InlineCode>,
-              "Very subtle tint",
+              "非常细微的着色",
             ],
           ]}
         />
       </InfoCard>
 
-      <InfoCard title="Text & Fills">
+      <InfoCard title="文字与填充">
         <Table
-          headers={["Token", "Purpose"]}
+          headers={["Token", "用途"]}
           rows={[
             [
               <InlineCode key="tp">--text-primary</InlineCode>,
-              "Headings, body text",
+              "标题、正文文字",
             ],
             [
               <InlineCode key="ts">--text-secondary</InlineCode>,
-              "Labels, supporting text",
+              "标签、辅助文字",
             ],
             [
               <InlineCode key="tt">--text-tertiary</InlineCode>,
-              "Placeholder, captions",
+              "占位符、说明文字",
             ],
             [
               <InlineCode key="fp">--fill-primary</InlineCode>,
-              "Primary interactive fill (buttons)",
+              "主要交互填充（按钮）",
             ],
             [
               <InlineCode key="fs">--fill-secondary</InlineCode>,
-              "Hover fill",
+              "悬停填充",
             ],
             [
               <InlineCode key="ft">--fill-tertiary</InlineCode>,
-              "Subtle fill (input backgrounds)",
+              "细微填充（输入框背景）",
             ],
           ]}
         />
       </InfoCard>
 
-      <InfoCard title="Accent & System Colors">
+      <InfoCard title="强调色与系统颜色">
         <Table
-          headers={["Token", "Purpose"]}
+          headers={["Token", "用途"]}
           rows={[
             [
               <InlineCode key="a">--accent</InlineCode>,
-              "Primary brand accent (buttons, active states)",
+              "主要品牌强调色（按钮、激活状态）",
             ],
             [
               <InlineCode key="af">--accent-fill</InlineCode>,
-              "Accent at 15% opacity (backgrounds)",
+              "15% 透明度的强调色（背景）",
             ],
-            [<InlineCode key="sb">--system-blue</InlineCode>, "Links, focus rings"],
-            [<InlineCode key="sg">--system-green</InlineCode>, "Success, active toggles"],
-            [<InlineCode key="sr">--system-red</InlineCode>, "Errors, destructive actions"],
-            [<InlineCode key="so">--system-orange</InlineCode>, "Warnings"],
-            [<InlineCode key="sp">--system-purple</InlineCode>, "Tags, highlights"],
+            [<InlineCode key="sb">--system-blue</InlineCode>, "链接、焦点环"],
+            [<InlineCode key="sg">--system-green</InlineCode>, "成功、激活开关"],
+            [<InlineCode key="sr">--system-red</InlineCode>, "错误、破坏性操作"],
+            [<InlineCode key="so">--system-orange</InlineCode>, "警告"],
+            [<InlineCode key="sp">--system-purple</InlineCode>, "标签、高亮"],
           ]}
         />
       </InfoCard>
 
-      <InfoCard title="Code Blocks">
+      <InfoCard title="代码块">
         <Table
-          headers={["Token", "Purpose"]}
+          headers={["Token", "用途"]}
           rows={[
-            [<InlineCode key="cb">--code-bg</InlineCode>, "Code block background"],
-            [<InlineCode key="cbd">--code-border</InlineCode>, "Code block border"],
-            [<InlineCode key="ct">--code-text</InlineCode>, "Code text color"],
+            [<InlineCode key="cb">--code-bg</InlineCode>, "代码块背景"],
+            [<InlineCode key="cbd">--code-border</InlineCode>, "代码块边框"],
+            [<InlineCode key="ct">--code-text</InlineCode>, "代码文字颜色"],
           ]}
         />
       </InfoCard>
 
-      <SubHeading>Accent Color Override</SubHeading>
+      <SubHeading>强调色覆盖</SubHeading>
       <Paragraph>
-        When the user selects a custom accent color in settings, the
-        SettingsProvider applies it as inline styles on{" "}
-        <InlineCode>document.documentElement</InlineCode>, overriding the
-        theme's <InlineCode>--accent</InlineCode> and{" "}
-        <InlineCode>--accent-fill</InlineCode>. Setting it to null reverts to
-        the theme default.
+        当用户在设置中选择自定义强调色时，SettingsProvider 会将其作为内联样式应用到 <InlineCode>document.documentElement</InlineCode>，
+        覆盖主题的 <InlineCode>--accent</InlineCode> 和 <InlineCode>--accent-fill</InlineCode>。
+        将其设置为 null 可恢复到主题默认值。
       </Paragraph>
 
-      <SubHeading>Adding a New Theme</SubHeading>
+      <SubHeading>添加新主题</SubHeading>
       <NumberedList
         items={[
           <>
-            Add the theme ID to the <InlineCode>ThemeId</InlineCode> type
-            union and <InlineCode>THEMES</InlineCode> array in{" "}
-            <InlineCode>lib/themes.ts</InlineCode>.
+            在 <InlineCode>lib/themes.ts</InlineCode> 中将主题 ID 添加到 <InlineCode>ThemeId</InlineCode> 类型联合和 <InlineCode>THEMES</InlineCode> 数组。
           </>,
           <>
-            Add a <InlineCode>[data-theme="name"]</InlineCode> block in{" "}
-            <InlineCode>app/globals.css</InlineCode> defining every CSS custom
-            property token. Copy the dark theme block as a starting point.
+            在 <InlineCode>app/globals.css</InlineCode> 中添加 <InlineCode>[data-theme="name"]</InlineCode> 块，
+            定义每个 CSS 自定义属性 token。以深色主题块为起点。
           </>,
-          "Optionally add theme-specific overrides (body background gradients, component styles).",
-          "The ThemeProvider, onboarding wizard, and settings page will automatically pick up the new theme.",
+          "（可选）添加主题特定覆盖（body 背景渐变、组件样式）。",
+          "ThemeProvider、引导向导和设置页面将自动识别新主题。",
         ]}
       />
 
       <Callout type="tip">
-        Missing tokens will cause components to render with broken styles.
-        Always define every token when creating a new theme -- use the dark theme
-        block as a complete template.
+        缺失的 token 会导致组件以错误的样式渲染。创建新主题时始终定义每个 token —— 以深色主题块作为完整模板。
       </Callout>
 
-      <SubHeading>Spacing & Typography</SubHeading>
+      <SubHeading>间距与排版</SubHeading>
       <BulletList
         items={[
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Spacing</strong>{" "}
-            -- 4px grid: <InlineCode>--space-1</InlineCode> (4px) through{" "}
-            <InlineCode>--space-16</InlineCode> (64px)
+            <strong style={{ color: "var(--text-primary)" }}>间距</strong>{" "}
+            -- 4px 网格：<InlineCode>--space-1</InlineCode> (4px) 到 <InlineCode>--space-16</InlineCode> (64px)
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Typography</strong>{" "}
-            -- Apple HIG scale: <InlineCode>--text-caption2</InlineCode> (11px)
-            through <InlineCode>--text-large-title</InlineCode> (34px)
+            <strong style={{ color: "var(--text-primary)" }}>排版</strong>{" "}
+            -- Apple HIG 字号：<InlineCode>--text-caption2</InlineCode> (11px) 到 <InlineCode>--text-large-title</InlineCode> (34px)
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Radius</strong>{" "}
-            -- <InlineCode>--radius-sm</InlineCode> (6px) through{" "}
-            <InlineCode>--radius-2xl</InlineCode> (24px)
+            <strong style={{ color: "var(--text-primary)" }}>圆角</strong>{" "}
+            -- <InlineCode>--radius-sm</InlineCode> (6px) 到 <InlineCode>--radius-2xl</InlineCode> (24px)
           </>,
           <>
-            <strong style={{ color: "var(--text-primary)" }}>Easing</strong>{" "}
-            -- <InlineCode>--ease-spring</InlineCode> (bouncy),{" "}
-            <InlineCode>--ease-smooth</InlineCode> (general),{" "}
-            <InlineCode>--ease-snappy</InlineCode> (quick)
+            <strong style={{ color: "var(--text-primary)" }}>缓动</strong>{" "}
+            -- <InlineCode>--ease-spring</InlineCode>（弹性）、<InlineCode>--ease-smooth</InlineCode>（平滑）、<InlineCode>--ease-snappy</InlineCode>（快速）
           </>,
         ]}
       />

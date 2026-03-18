@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import type { MediaAttachment } from '@/lib/conversations'
+import { i18n } from '@/lib/i18n'
 
 interface MediaPreviewProps {
   attachments: MediaAttachment[]
@@ -32,7 +33,7 @@ export function MediaPreview({ attachments, onRemove }: MediaPreviewProps) {
           {att.type === 'image' ? (
             <img
               src={att.url}
-              alt={att.name || 'Preview'}
+              alt={att.name || i18n.common.preview}
               style={{
                 width: '100%',
                 height: '100%',

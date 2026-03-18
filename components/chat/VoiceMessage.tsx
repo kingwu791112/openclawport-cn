@@ -1,6 +1,7 @@
 'use client'
 import React, { useEffect, useRef, useState, useCallback } from 'react'
 import { formatDuration } from '@/lib/audio-recorder'
+import { i18n } from '@/lib/i18n'
 
 interface VoiceMessageProps {
   src: string
@@ -67,7 +68,7 @@ export function VoiceMessage({ src, duration, waveform, isUser }: VoiceMessagePr
       {/* Play/Pause button */}
       <button
         onClick={toggle}
-        aria-label={playing ? 'Pause' : 'Play'}
+        aria-label={playing ? i18n.chat.pause : i18n.chat.play}
         style={{
           width: 28,
           height: 28,

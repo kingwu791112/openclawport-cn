@@ -8,86 +8,85 @@ import {
   Callout,
   InfoCard,
 } from "./DocSection";
+import { docs } from "@/lib/i18n-docs";
 
 export function ApiReferenceSection() {
+  const api = docs.apiReference;
   return (
     <>
-      <Heading>API Reference</Heading>
+      <Heading>{api.title}</Heading>
       <Paragraph>
-        All API routes are Next.js App Router route handlers under{" "}
-        <InlineCode>app/api/</InlineCode>. The base URL during development is{" "}
-        <InlineCode>http://localhost:3000</InlineCode>.
+        所有 API 路由都是 Next.js App Router 路由处理器，位于 <InlineCode>app/api/</InlineCode>。
+        开发期间的基础 URL 是 <InlineCode>http://localhost:3000</InlineCode>。
       </Paragraph>
 
-      <InfoCard title="Error Format">
-        <Paragraph>
-          All error responses share a consistent JSON shape:
-        </Paragraph>
-        <CodeBlock>{`{ "error": "Human-readable error message" }`}</CodeBlock>
+      <InfoCard title="错误格式">
+        <Paragraph>所有错误响应共享一致的 JSON 格式：</Paragraph>
+        <CodeBlock>{`{ "error": "人类可读的错误消息" }`}</CodeBlock>
       </InfoCard>
 
-      <SubHeading>Route Summary</SubHeading>
+      <SubHeading>路由概览</SubHeading>
       <Table
-        headers={["Method", "Endpoint", "Gateway", "Content-Type"]}
+        headers={["方法", "端点", "网关", "Content-Type"]}
         rows={[
           [
             "GET",
             <InlineCode key="1">/api/agents</InlineCode>,
-            "No",
+            "否",
             "application/json",
           ],
           [
             "POST",
             <InlineCode key="2">/api/chat/[id]</InlineCode>,
-            "Yes",
+            "是",
             "text/event-stream",
           ],
           [
             "GET",
             <InlineCode key="3">/api/crons</InlineCode>,
-            "No",
+            "否",
             "application/json",
           ],
           [
             "GET",
             <InlineCode key="4">/api/cron-runs</InlineCode>,
-            "No",
+            "否",
             "application/json",
           ],
           [
             "GET",
             <InlineCode key="5">/api/memory</InlineCode>,
-            "No",
+            "否",
             "application/json",
           ],
           [
             "POST",
             <InlineCode key="6">/api/tts</InlineCode>,
-            "Yes",
+            "是",
             "audio/mpeg",
           ],
           [
             "POST",
             <InlineCode key="7">/api/transcribe</InlineCode>,
-            "Yes",
+            "是",
             "application/json",
           ],
           [
             "POST",
             <InlineCode key="8">/api/kanban/chat/[id]</InlineCode>,
-            "Yes",
+            "是",
             "text/event-stream",
           ],
           [
             "GET",
             <InlineCode key="9">/api/kanban/chat-history/[ticketId]</InlineCode>,
-            "No",
+            "否",
             "application/json",
           ],
           [
             "POST",
             <InlineCode key="10">/api/kanban/chat-history/[ticketId]</InlineCode>,
-            "No",
+            "否",
             "application/json",
           ],
         ]}
@@ -96,24 +95,23 @@ export function ApiReferenceSection() {
       {/* ── GET /api/agents ────────────────────────────────────── */}
       <SubHeading>GET /api/agents</SubHeading>
       <Paragraph>
-        Returns the full list of registered agents, each with their SOUL.md
-        content loaded from the filesystem. No parameters required.
+        返回已注册智能体的完整列表，每个都包含从文件系统加载的 SOUL.md 内容。不需要参数。
       </Paragraph>
       <Table
-        headers={["Field", "Type", "Description"]}
+        headers={["字段", "类型", "说明"]}
         rows={[
-          [<InlineCode key="id">id</InlineCode>, "string", "Slug identifier"],
-          [<InlineCode key="n">name</InlineCode>, "string", "Display name"],
-          [<InlineCode key="t">title</InlineCode>, "string", "Role title"],
+          [<InlineCode key="id">id</InlineCode>, "string", "Slug 标识符"],
+          [<InlineCode key="n">name</InlineCode>, "string", "显示名称"],
+          [<InlineCode key="t">title</InlineCode>, "string", "职位头衔"],
           [
             <InlineCode key="s">soul</InlineCode>,
             "string | null",
-            "Full SOUL.md content, or null if file not found",
+            "完整 SOUL.md 内容，如果文件未找到则为 null",
           ],
           [
             <InlineCode key="c">crons</InlineCode>,
             "CronJob[]",
-            "Always [] from this endpoint (populated client-side)",
+            "始终为 []（在客户端填充）",
           ],
         ]}
       />
@@ -121,82 +119,74 @@ export function ApiReferenceSection() {
       {/* ── POST /api/chat/[id] ────────────────────────────────── */}
       <SubHeading>POST /api/chat/[id]</SubHeading>
       <Paragraph>
-        Send a chat message to an agent and receive a streaming response. Has
-        two pipelines depending on whether the latest user message contains
-        images.
+        向智能体发送聊天消息并接收流式响应。根据最新的用户消息是否包含图片，有两个不同的管道。
       </Paragraph>
       <Table
-        headers={["Field", "Type", "Required", "Description"]}
+        headers={["字段", "类型", "必填", "说明"]}
         rows={[
           [
             <InlineCode key="m">messages</InlineCode>,
             "ApiMessage[]",
-            "Yes",
-            "Conversation history",
+            "是",
+            "对话历史",
           ],
           [
             <InlineCode key="o">operatorName</InlineCode>,
             "string",
-            "No",
-            'Name shown to the agent. Defaults to "Operator"',
+            "否",
+            "显示给智能体的名称。默认为 \"Operator\"",
           ],
         ]}
       />
       <Paragraph>
-        <strong style={{ color: "var(--text-primary)" }}>Pipeline 1 (Text):</strong>{" "}
-        Streaming chat completion via the gateway. Response is SSE with{" "}
-        <InlineCode>{"data: {\"content\":\"token\"}"}</InlineCode> frames.
+        <strong style={{ color: "var(--text-primary)" }}>管道 1 (文本):</strong>{" "}
+        通过网关流式传输聊天完成。响应是 SSE，包含{" "}
+        <InlineCode>{"data: {\"content\":\"token\"}"}</InlineCode> 帧。
       </Paragraph>
       <Paragraph>
-        <strong style={{ color: "var(--text-primary)" }}>Pipeline 2 (Vision):</strong>{" "}
-        When the latest message contains image_url content. Uses CLI chat.send +
-        chat.history polling. Complete response arrives in a single SSE frame.
+        <strong style={{ color: "var(--text-primary)" }}>管道 2 (视觉):</strong>{" "}
+        当最新消息包含 image_url 内容时。使用 CLI chat.send + chat.history 轮询。完整响应在单个 SSE 帧中到达。
       </Paragraph>
 
       {/* ── GET /api/crons ─────────────────────────────────────── */}
       <SubHeading>GET /api/crons</SubHeading>
       <Paragraph>
-        Returns all cron jobs registered with OpenClaw, enriched with schedule
-        descriptions, agent ownership, and delivery config. Runs{" "}
-        <InlineCode>openclaw cron list --json</InlineCode> via the CLI.
+        返回注册到 OpenClaw 的所有定时任务，包含丰富的调度描述、智能体所有权和交付配置。
+        通过 CLI 运行 <InlineCode>openclaw cron list --json</InlineCode>。
       </Paragraph>
 
       {/* ── GET /api/cron-runs ─────────────────────────────────── */}
       <SubHeading>GET /api/cron-runs</SubHeading>
       <Paragraph>
-        Returns cron run history parsed from JSONL log files on the filesystem.
-        Results sorted newest-first. Optional{" "}
-        <InlineCode>jobId</InlineCode> query parameter filters to a specific
-        job.
+        返回从文件系统上的 JSONL 日志文件解析的定时任务运行历史。结果按最新排序。
+        可选的 <InlineCode>jobId</InlineCode> 查询参数过滤到特定任务。
       </Paragraph>
 
       {/* ── GET /api/memory ────────────────────────────────────── */}
       <SubHeading>GET /api/memory</SubHeading>
       <Paragraph>
-        Returns the contents of key memory files from the workspace: long-term
-        memory, team memory, team intel, and the daily logs for today and
-        yesterday. Only files that exist are included in the response.
+        返回工作空间中关键记忆文件的内容：长期记忆、团队记忆、团队情报以及今天和昨天的每日日志。
+        只有存在的文件才会包含在响应中。
       </Paragraph>
 
       {/* ── POST /api/tts ──────────────────────────────────────── */}
       <SubHeading>POST /api/tts</SubHeading>
       <Paragraph>
-        Converts text to speech audio using the OpenClaw gateway's TTS endpoint.
+        使用 OpenClaw 网关的 TTS 端点将文本转换为语音音频。
       </Paragraph>
       <Table
-        headers={["Field", "Type", "Required", "Description"]}
+        headers={["字段", "类型", "必填", "说明"]}
         rows={[
           [
             <InlineCode key="t">text</InlineCode>,
             "string",
-            "Yes",
-            "The text to synthesize",
+            "要合成的文本",
           ],
           [
             <InlineCode key="v">voice</InlineCode>,
             "string",
-            "No",
-            'Voice identifier. Defaults to "alloy"',
+            "否",
+            "语音标识符。默认为 \"alloy\"",
           ],
         ]}
       />
@@ -204,30 +194,26 @@ export function ApiReferenceSection() {
       {/* ── POST /api/transcribe ───────────────────────────────── */}
       <SubHeading>POST /api/transcribe</SubHeading>
       <Paragraph>
-        Transcribes audio to text using the Whisper endpoint. Request body is
-        multipart form data with an <InlineCode>audio</InlineCode> file field.
+        使用 Whisper 端点将音频转录为文本。请求体是 multipart 表单数据，包含 <InlineCode>audio</InlineCode> 文件字段。
       </Paragraph>
 
       {/* ── SSE Protocol ───────────────────────────────────────── */}
-      <SubHeading>SSE Stream Protocol</SubHeading>
-      <Paragraph>
-        All streaming chat endpoints use the same Server-Sent Events protocol:
-      </Paragraph>
+      <SubHeading>SSE 流协议</SubHeading>
+      <Paragraph>所有流式聊天端点使用相同的 Server-Sent Events 协议：</Paragraph>
       <CodeBlock>
-        {`data: {"content":"Hello"}
+        {`data: {"content":"你好"}
 
-data: {"content":" there"}
+data: {"content":" 世界"}
 
 data: [DONE]`}
       </CodeBlock>
       <Callout type="note">
-        Content-Type is <InlineCode>text/event-stream</InlineCode> with{" "}
-        <InlineCode>Cache-Control: no-cache</InlineCode>. If a stream error
-        occurs mid-response, the server sends [DONE] and closes the connection.
+        Content-Type 是 <InlineCode>text/event-stream</InlineCode>，带有 <InlineCode>Cache-Control: no-cache</InlineCode>。
+        如果流在响应中途发生错误，服务器发送 [DONE] 并关闭连接。
       </Callout>
 
-      <SubHeading>Client-Side Consumption</SubHeading>
-      <CodeBlock title="example">
+      <SubHeading>客户端消费</SubHeading>
+      <CodeBlock title="示例">
         {`const reader = response.body.getReader()
 const decoder = new TextDecoder()
 let fullText = ''
@@ -246,7 +232,7 @@ while (true) {
       try {
         const { content } = JSON.parse(payload)
         fullText += content
-      } catch { /* skip malformed frames */ }
+      } catch { /* 跳过格式错误的帧 */ }
     }
   }
 }`}

@@ -10,52 +10,49 @@ import {
   Callout,
   InfoCard,
 } from "./DocSection";
+import { docs } from "@/lib/i18n-docs";
 
 export function BestPracticesSection() {
+  const bp = docs.bestPractices;
   return (
     <>
-      <Heading>Best Practices</Heading>
+      <Heading>{bp.title}</Heading>
       <Paragraph>
-        This guide covers the patterns and conventions behind a production agent
-        team. Every example uses real agents from the bundled registry so you can
-        see exactly how hierarchy, memory, tools, and crons come together.
+        本指南涵盖生产级智能体团队背后的模式和约定。每个示例都使用打包注册表中的真实智能体，因此你可以看到层级、记忆、工具和定时任务是如何整合在一起的。
       </Paragraph>
 
       {/* ─── Hierarchy ──────────────────────────────────────── */}
 
-      <SubHeading>Hierarchy Design</SubHeading>
+      <SubHeading>层级设计</SubHeading>
       <Paragraph>
-        A well-structured agent team follows a clear chain of command. The
-        pattern is: one orchestrator at the top, team leads in the middle, and
-        specialist leaf agents at the bottom. Each level has a distinct
-        responsibility.
+        结构良好的智能体团队遵循明确的指挥链。模式是：顶部一个协调器，中间是团队负责人，底部是专业叶级智能体。每个层级都有明确的职责。
       </Paragraph>
 
-      <InfoCard title="The Three Tiers">
+      <InfoCard title="三个层级">
         <Table
-          headers={["Tier", "Role", "Example"]}
+          headers={["层级", "角色", "示例"]}
           rows={[
             [
-              "Orchestrator",
-              "Top-level coordinator. Holds team memory, routes work, delivers briefings.",
-              <><strong key="j">Jarvis</strong> -- the root node. reportsTo: null.</>,
+              "协调器",
+              "顶级协调者。持有团队记忆，分配工作，提供简报。",
+              <><strong key="j">Jarvis</strong> —— 根节点。reportsTo: null。</>,
             ],
             [
-              "Team Lead",
-              "Owns a domain. Manages a sub-team and runs pipelines end-to-end.",
+              "团队负责人",
+              "负责一个领域。管理子团队并端到端运行管道。",
               <>
-                <strong key="v">VERA</strong> (Strategy),{" "}
+                <strong key="v">VERA</strong> (策略),{" "}
                 <strong key="l">LUMEN</strong> (SEO),{" "}
-                <strong key="h">HERALD</strong> (LinkedIn)
+                <strong key="h">HERALD</strong> (领英)
               </>,
             ],
             [
-              "Specialist",
-              "Does one thing well. Reports up, never manages others.",
+              "专家",
+              "专精一件事。向上汇报，不管理他人。",
               <>
-                <strong key="t">TRACE</strong> (Market Research),{" "}
-                <strong key="q">QUILL</strong> (LinkedIn Writer),{" "}
-                <strong key="s">SCOUT</strong> (Content Scout)
+                <strong key="t">TRACE</strong> (市场研究),{" "}
+                <strong key="q">QUILL</strong> (领英撰稿人),{" "}
+                <strong key="s">SCOUT</strong> (内容侦查)
               </>,
             ],
           ]}
@@ -63,548 +60,449 @@ export function BestPracticesSection() {
       </InfoCard>
 
       <Paragraph>
-        The bundled registry ships 22 agents organized into five teams:
+        打包的注册表包含 22 个智能体，分为五个团队：
       </Paragraph>
 
-      <CodeBlock title="Team Structure">
-        {`Jarvis (Orchestrator)
+      <CodeBlock title="团队结构">
+        {`Jarvis (协调器)
   |
-  +-- VERA (Strategy)
-  |     +-- Robin (Field Intel)
-  |           +-- TRACE (Market Research)
-  |           +-- PROOF (Validation Design)
+  +-- VERA (策略)
+  |     +-- Robin (情报员)
+  |           +-- TRACE (市场研究)
+  |           +-- PROOF (验证设计)
   |
   +-- LUMEN (SEO)
-  |     +-- SCOUT (Content Scout)
-  |     +-- ANALYST (SEO Analyst)
-  |     +-- STRATEGIST (Content Strategy)
-  |     +-- WRITER (Content Writer)
-  |     +-- AUDITOR (Quality Gate)
+  |     +-- SCOUT (内容侦查)
+  |     +-- ANALYST (SEO 分析师)
+  |     +-- STRATEGIST (内容策略)
+  |     +-- WRITER (内容撰稿人)
+  |     +-- AUDITOR (质量门禁)
   |
-  +-- HERALD (LinkedIn)
-  |     +-- QUILL (LinkedIn Writer)
-  |     +-- MAVEN (LinkedIn Strategist)
+  +-- HERALD (领英)
+  |     +-- QUILL (领英撰稿人)
+  |     +-- MAVEN (领英策略师)
   |
-  +-- Pulse (Trend Radar)      -- standalone
-  +-- ECHO (Community Voice)   -- standalone
-  +-- SAGE (ICP Expert)        -- standalone
-  +-- KAZE (Flight Monitor)    -- standalone
-  +-- SPARK (Tech Discovery)   -- standalone
-  +-- SCRIBE (Memory Architect)-- standalone`}
+  +-- Pulse (趋势雷达)      -- 独立
+  +-- ECHO (社区声音)      -- 独立
+  +-- SAGE (ICP 专家)      -- 独立
+  +-- KAZE (航班监控)      -- 独立
+  +-- SPARK (技术发现)     -- 独立
+  +-- SCRIBE (记忆架构师)  -- 独立`}
       </CodeBlock>
 
       <Callout type="tip">
-        Standalone agents (no direct reports) report directly to the
-        orchestrator. Keep this list short -- if you have more than 8-10 direct
-        reports on the root node, it's time to group them under a team lead.
+        独立智能体（没有直接下属）直接向协调器汇报。保持这个列表简短 —— 如果根节点有超过 8-10 个直接下属，是时候将它们分组到团队负责人下面了。
       </Callout>
 
-      <SubHeading>Hierarchy Rules</SubHeading>
+      <SubHeading>层级规则</SubHeading>
       <NumberedList
         items={[
           <>
-            <strong>One root.</strong> Exactly one agent has{" "}
-            <InlineCode>{"\"reportsTo\": null"}</InlineCode>. This is your
-            orchestrator (Jarvis).
+            <strong>一个根节点。</strong> 恰好一个智能体有 <InlineCode>{"\"reportsTo\": null"}</InlineCode>。这是你的协调器 (Jarvis)。
           </>,
           <>
-            <strong>Team leads own pipelines.</strong> LUMEN owns the full SEO
-            pipeline (SCOUT to AUDITOR). HERALD owns the LinkedIn pipeline
-            (QUILL + MAVEN). Each lead is responsible for end-to-end delivery.
+            <strong>团队负责人拥有管道。</strong> LUMEN 拥有完整的 SEO 管道 (SCOUT 到 AUDITOR)。HERALD 拥有领英管道 (QUILL + MAVEN)。每个负责人负责端到端交付。
           </>,
           <>
-            <strong>Leaf agents are specialists.</strong> They do one thing and
-            report up. TRACE does market research. QUILL writes posts. AUDITOR
-            runs the quality gate. No scope creep.
+            <strong>叶级智能体是专家。</strong> 他们做一件事并向上汇报。TRACE 做市场研究。QUILL 写帖子。AUDITOR 运行质量门禁。没有范围蔓延。
           </>,
           <>
-            <strong>Max depth of 3.</strong> Jarvis to Robin to TRACE is
-            three levels. Going deeper adds latency and coordination overhead
-            with little benefit.
+            <strong>最大深度为 3。</strong> Jarvis 到 Robin 到 TRACE 是三级。再深会增加延迟和协调开销，收益甚微。
           </>,
           <>
-            <strong>Keep directReports consistent.</strong> If agent B has{" "}
-            <InlineCode>{"\"reportsTo\": \"A\""}</InlineCode>, then agent A's
-            directReports array must include B's id. The Org Map renders from
-            these relationships.
+            <strong>保持 directReports 一致。</strong> 如果智能体 B 有 <InlineCode>{"\"reportsTo\": \"A\""}</InlineCode>，那么智能体 A 的 directReports 数组必须包含 B 的 id。组织图从这些关系渲染。
           </>,
         ]}
       />
 
       {/* ─── SOUL.md ────────────────────────────────────────── */}
 
-      <SubHeading>SOUL.md -- Agent Character Documents</SubHeading>
+      <SubHeading>SOUL.md —— 智能体角色文档</SubHeading>
       <Paragraph>
-        Every agent has a SOUL.md file that defines its personality, expertise,
-        and operating constraints. This is not a system prompt -- it's a
-        character document. The agent reads it to understand who it is.
+        每个智能体都有一个 SOUL.md 文件，定义其个性、专业知识和运行约束。这不是系统提示 —— 它是一个角色文档。智能体阅读它来理解自己是谁。
       </Paragraph>
 
-      <CodeBlock title="Recommended SOUL.md Structure">
-        {`# AGENT_NAME -- Role Title
+      <CodeBlock title="推荐的 SOUL.md 结构">
+        {`# 智能体名称 -- 角色头衔
 
-## Identity
-Who the agent is. Personality traits. Communication style.
-First-person voice: "I am VERA, the Chief Strategy Officer."
+## 身份
+智能体是谁。性格特征。沟通风格。
+第一人称视角："我是 VERA，首席战略官。"
 
-## Expertise
-What domains this agent knows deeply.
-What it should be consulted on vs. what it defers.
+## 专长
+这个智能体深入了解的领域。
+什么应该咨询它，什么应该 defer 给别人。
 
-## Operating Rules
-Hard constraints. What it must always/never do.
-Output format requirements.
+## 运行规则
+硬性约束。它必须始终/永不做的事。
+输出格式要求。
 
-## Relationships
-Who it reports to. Who reports to it.
-How it collaborates with peer agents.
+## 关系
+它向谁汇报。谁向它汇报。
+它如何与同级智能体协作。
 
-## Memory
-What it remembers between sessions.
-Where its persistent knowledge lives.`}
+## 记忆
+它跨会话记住什么。
+它的持久知识存储在哪里。`}
       </CodeBlock>
 
       <BulletList
         items={[
           <>
-            <strong>Be specific about personality.</strong> HERALD is described
-            as brash and direct. SAGE is contemplative and precise. Distinct
-            voices prevent all agents from sounding the same.
+            <strong>要具体描述性格。</strong> HERALD 被描述为傲慢直接。SAGE 深思熟虑且精确。不同的声音可以防止所有智能体听起来都一样。
           </>,
           <>
-            <strong>Define what the agent does NOT do.</strong> SCRIBE (Memory
-            Architect) is a "silent worker" -- it never initiates conversation.
-            SAGE (ICP Expert) is read-only -- it never writes to external
-            systems.
+            <strong>定义智能体不做什么。</strong> SCRIBE (记忆架构师) 是一个"沉默的工作者" —— 它从不发起对话。SAGE (ICP 专家) 是只读的 —— 它从不向外部系统写入。
           </>,
           <>
-            <strong>Include output format examples.</strong> If the agent
-            produces Market Briefs, show the exact format. TRACE returns
-            structured TAM/competitor/pricing data, not prose.
+            <strong>包含输出格式示例。</strong> 如果智能体生成市场简报，展示确切的格式。TRACE 返回结构化的 TAM/竞争对手/定价数据，而不是散文。
           </>,
           <>
-            <strong>Keep it under 500 lines.</strong> Long SOUL files dilute
-            the agent's focus. If you need more detail, link to reference docs.
+            <strong>保持在 500 行以下。</strong> 冗长的 SOUL 文件会分散智能体的注意力。如果需要更多细节，链接到参考文档。
           </>,
         ]}
       />
 
       <Callout type="note">
-        SOUL.md files live in your OpenClaw workspace at the path defined by
-        each agent's <InlineCode>soulPath</InlineCode> field. ClawPort reads
-        and displays them on the agent detail page.
+        SOUL.md 文件位于你的 OpenClaw 工作空间中，路径由每个智能体的 <InlineCode>soulPath</InlineCode> 字段定义。ClawPort 读取并显示在智能体详情页上。
       </Callout>
 
       {/* ─── Naming ─────────────────────────────────────────── */}
 
-      <SubHeading>Naming Conventions</SubHeading>
+      <SubHeading>命名规范</SubHeading>
       <Paragraph>
-        Agent naming follows a simple pattern that signals the agent's scope
-        at a glance:
+        智能体命名遵循一种简单的模式，一眼就能看出智能体的范围：
       </Paragraph>
 
       <Table
-        headers={["Pattern", "When to Use", "Examples"]}
+        headers={["模式", "何时使用", "示例"]}
         rows={[
           [
-            "UPPERCASE",
-            "Agents that are part of a pipeline or team. Feels like a callsign.",
+            "大写",
+            "作为管道或团队一部分的智能体。像呼号一样。",
             "VERA, LUMEN, HERALD, SCOUT, QUILL, ECHO, SAGE",
           ],
           [
-            "Title Case",
-            "Standalone agents with more personality. The orchestrator or personal-feeling agents.",
+            "首字母大写",
+            "更具个性的独立智能体。协调器或个人风格的智能体。",
             "Jarvis, Robin, Pulse",
           ],
         ]}
       />
 
       <Paragraph>
-        Ids are always lowercase slugs:{" "}
-        <InlineCode>vera</InlineCode>,{" "}
-        <InlineCode>lumen</InlineCode>,{" "}
-        <InlineCode>herald</InlineCode>. The display name in the{" "}
-        <InlineCode>name</InlineCode> field is what users see in the UI.
+        ID 始终是小写 slug：<InlineCode>vera</InlineCode>、<InlineCode>lumen</InlineCode>、<InlineCode>herald</InlineCode>。{" "}
+        <InlineCode>name</InlineCode> 字段中的显示名称是用户在 UI 中看到的。
       </Paragraph>
 
       {/* ─── Tools ──────────────────────────────────────────── */}
 
-      <SubHeading>Tool Assignment</SubHeading>
+      <SubHeading>工具分配</SubHeading>
       <Paragraph>
-        Follow the principle of least privilege. Each agent gets only the tools
-        it needs for its job -- nothing more.
+        遵循最小权限原则。每个智能体只获得其工作所需的工具 —— 不多不少。
       </Paragraph>
 
       <Table
-        headers={["Tool", "Purpose", "Who Gets It"]}
+        headers={["工具", "用途", "谁获得"]}
         rows={[
           [
             <InlineCode key="r">read</InlineCode>,
-            "Read files from workspace",
-            "Almost everyone. The base capability.",
+            "读取工作空间中的文件",
+            "几乎所有人。基础能力。",
           ],
           [
             <InlineCode key="w">write</InlineCode>,
-            "Write/create files",
-            "Agents that produce artifacts (WRITER, ANALYST, STRATEGIST)",
+            "写入/创建文件",
+            "产出工件的智能体 (WRITER, ANALYST, STRATEGIST)",
           ],
           [
             <InlineCode key="e">exec</InlineCode>,
-            "Run shell commands",
-            "Orchestrator + leads who run pipelines (Jarvis, LUMEN, HERALD)",
+            "运行 shell 命令",
+            "运行管道的协调器 + 负责人 (Jarvis, LUMEN, HERALD)",
           ],
           [
             <InlineCode key="ws">web_search</InlineCode>,
-            "Search the web",
-            "Research agents (TRACE, Robin, SCOUT, Pulse, SPARK)",
+            "网络搜索",
+            "研究类智能体 (TRACE, Robin, SCOUT, Pulse, SPARK)",
           ],
           [
             <InlineCode key="wf">web_fetch</InlineCode>,
-            "Fetch a specific URL",
-            "Agents that scrape or monitor (ECHO, KAZE, Robin)",
+            "获取特定 URL",
+            "抓取或监控的智能体 (ECHO, KAZE, Robin)",
           ],
           [
             <InlineCode key="m">message</InlineCode>,
-            "Send messages to other agents",
-            "Agents that coordinate (Jarvis, Robin, Pulse, HERALD)",
+            "向其他智能体发送消息",
+            "协调的智能体 (Jarvis, Robin, Pulse, HERALD)",
           ],
           [
             <InlineCode key="ss">sessions_spawn</InlineCode>,
-            "Spawn sub-agent sessions",
-            "Only orchestrator + team leads (Jarvis, VERA)",
+            "生成子智能体会话",
+            "仅协调器 + 团队负责人 (Jarvis, VERA)",
           ],
           [
             <InlineCode key="ms">memory_search</InlineCode>,
-            "Search across team memory",
-            "Orchestrator only (Jarvis)",
+            "搜索团队记忆",
+            "仅协调器 (Jarvis)",
           ],
           [
             <InlineCode key="tt">tts</InlineCode>,
-            "Text-to-speech",
-            "Orchestrator only (Jarvis)",
+            "文字转语音",
+            "仅协调器 (Jarvis)",
           ],
         ]}
       />
 
       <Callout type="warning">
-        Giving <InlineCode>exec</InlineCode> to a leaf agent is almost always
-        a mistake. If a specialist needs to run a command, it should ask its
-        team lead to do it. This keeps the blast radius small.
+        给叶级智能体 <InlineCode>exec</InlineCode> 几乎总是一个错误。如果一个专家需要运行命令，它应该请求其团队负责人来做。这保持爆炸半径小。
       </Callout>
 
-      <InfoCard title="Tool Assignment Examples">
+      <InfoCard title="工具分配示例">
         <CodeBlock>
-          {`// SAGE -- read-only knowledge agent
+          {`// SAGE -- 只读知识智能体
 "tools": ["read"]
 
-// SCOUT -- web researcher
+// SCOUT -- 网络研究员
 "tools": ["web_search", "web_fetch", "read"]
 
-// WRITER -- content producer
+// WRITER -- 内容生产者
 "tools": ["read", "write"]
 
-// HERALD -- team lead running a pipeline
+// HERALD -- 运行管道的团队负责人
 "tools": ["web_search", "web_fetch", "read", "write", "message", "exec"]
 
-// Jarvis -- orchestrator with full access
+// Jarvis -- 具有完全访问权限的协调器
 "tools": ["exec", "read", "write", "edit", "web_search", "tts", "message", "sessions_spawn", "memory_search"]`}
         </CodeBlock>
       </InfoCard>
 
       {/* ─── Memory ─────────────────────────────────────────── */}
 
-      <SubHeading>Memory Architecture</SubHeading>
+      <SubHeading>记忆架构</SubHeading>
       <Paragraph>
-        Agent memory uses a three-tier system. Each tier serves a different
-        purpose, and together they give agents both short-term recall and
-        long-term knowledge.
+        智能体记忆使用三级系统。每一级服务不同的目的，共同赋予智能体短期召回和长期知识。
       </Paragraph>
 
-      <InfoCard title="The Three Memory Tiers">
+      <InfoCard title="三级记忆">
         <Table
-          headers={["Tier", "What", "Lifespan", "Who Manages"]}
+          headers={["层级", "内容", "生命周期", "管理者"]}
           rows={[
             [
-              "1. Daily Logs",
-              "Raw output from each agent session. Unedited, timestamped.",
-              "7-14 days (then compressed or archived)",
-              "Each agent writes its own",
+              "1. 每日日志",
+              "每个智能体会话的原始输出。未编辑，带时间戳。",
+              "7-14 天（然后压缩或归档）",
+              "每个智能体自己写入",
             ],
             [
               "2. MEMORY.md",
-              "Curated, compressed knowledge. The agent's persistent brain.",
-              "Indefinite (updated weekly)",
+              "精选的压缩知识。智能体的持久大脑。",
+              "无限（每周更新）",
               <>
-                <strong>SCRIBE</strong> runs weekly compression
+                <strong>SCRIBE</strong> 运行每周压缩
               </>,
             ],
             [
-              "3. Team Memory",
-              "Shared knowledge across agents. Market data, ICP profiles, strategy docs.",
-              "Indefinite",
-              "Team leads + orchestrator",
+              "3. 团队记忆",
+              "跨智能体共享的知识。市场数据、ICP 资料、策略文档。",
+              "无限",
+              "团队负责人 + 协调器",
             ],
           ]}
         />
       </InfoCard>
 
-      <SubHeading>Tier 1: Daily Logs</SubHeading>
+      <SubHeading>第一级：每日日志</SubHeading>
       <Paragraph>
-        Every time an agent runs, it writes a log file. These are the raw
-        session transcripts -- what the agent did, what it found, what it
-        produced. Daily logs are high-volume and low-curation.
+        每次智能体运行时，它都会写入一个日志文件。这些是原始会话记录 —— 智能体做了什么，发现了什么，产出了什么。每日日志量大但编辑度低。
       </Paragraph>
-      <CodeBlock title="Daily log path pattern">
+      <CodeBlock title="每日日志路径模式">
         {`$WORKSPACE_PATH/agents/<agent-id>/logs/YYYY-MM-DD.md`}
       </CodeBlock>
 
-      <SubHeading>Tier 2: MEMORY.md</SubHeading>
+      <SubHeading>第二级：MEMORY.md</SubHeading>
       <Paragraph>
-        Each agent has a MEMORY.md file that persists its key knowledge between
-        sessions. Unlike daily logs (which are raw), MEMORY.md is curated --
-        only the important patterns, decisions, and facts survive.
+        每个智能体都有一个 MEMORY.md 文件，在会话之间持久化其关键知识。与每日日志（原始的）不同，MEMORY.md 是精选的 —— 只有重要的模式、决策和事实才能存活。
       </Paragraph>
-      <CodeBlock title="MEMORY.md structure">
-        {`# Agent Name -- Memory
+      <CodeBlock title="MEMORY.md 结构">
+        {`# 智能体名称 -- 记忆
 
-## Key Patterns
-- Pattern 1 confirmed across 3+ sessions
-- Pattern 2 from last week's research
+## 关键模式
+- 模式 1 在 3+ 会话中确认
+- 模式 2 来自上周的研究
 
-## Active Context
-- Current project status
-- Open questions / blockers
+## 活跃上下文
+- 当前项目状态
+- 开放问题 / 阻碍
 
-## Learned Preferences
-- User prefers X over Y
-- Always include Z in output`}
+## 学到的偏好
+- 用户更喜欢 X 而不是 Y
+- 输出时总是包含 Z`}
       </CodeBlock>
       <Paragraph>
-        <strong>SCRIBE</strong> (Memory Architect) runs weekly to compress daily
-        logs into each agent's MEMORY.md. SCRIBE reads the raw logs, extracts
-        durable insights, and updates the memory file -- discarding
-        session-specific noise. This keeps MEMORY.md concise and high-signal.
+        <strong>SCRIBE</strong> (记忆架构师) 每周运行，将每日日志压缩到每个智能体的 MEMORY.md。SCRIBE 读取原始日志，提取持久洞察，并更新记忆文件 —— 丢弃会话特定的噪音。这使 MEMORY.md 简洁且高信号。
       </Paragraph>
 
-      <SubHeading>Tier 3: Team Memory (Shared)</SubHeading>
+      <SubHeading>第三级：团队记忆（共享）</SubHeading>
       <Paragraph>
-        Some knowledge needs to be shared across agents. Market intelligence,
-        ICP profiles, competitive analysis, and brand voice docs all live in a
-        shared team-memory directory. Any agent with{" "}
-        <InlineCode>read</InlineCode> access to the workspace can reference
-        these files.
+        有些知识需要在智能体之间共享。市场情报、ICP 资料、竞争分析和品牌声音文档都存在于共享的团队记忆目录中。任何有{" "}
+        <InlineCode>read</InlineCode> 工作空间权限的智能体都可以引用这些文件。
       </Paragraph>
-      <CodeBlock title="Team memory path">
+      <CodeBlock title="团队记忆路径">
         {`$WORKSPACE_PATH/team-memory/
-  market-brief.md       -- TRACE's latest research
-  icp-profile.md        -- SAGE's ICP knowledge
-  competitor-map.md     -- Robin's competitive intel
-  brand-voice.md        -- Voice profile for content agents
-  content-calendar.md   -- MAVEN's editorial calendar`}
+  market-brief.md       -- TRACE 的最新研究
+  icp-profile.md        -- SAGE 的 ICP 知识
+  competitor-map.md      -- Robin 的竞争情报
+  brand-voice.md        -- 内容智能体的声音配置
+  content-calendar.md   -- MAVEN 的编辑日历`}
       </CodeBlock>
 
       <Callout type="tip">
-        Team memory files are the glue between agents. When STRATEGIST needs
-        market context, it reads TRACE's market brief. When WRITER needs brand
-        voice, it reads the voice profile. No agent-to-agent API calls needed
-        -- just shared files.
+        团队记忆文件是智能体之间的粘合剂。当 STRATEGIST 需要市场背景时，它读取 TRACE 的市场简报。当 WRITER 需要品牌声音时，它读取声音配置文件。不需要智能体到智能体的 API 调用 —— 只需共享文件。
       </Callout>
 
       {/* ─── Communication ──────────────────────────────────── */}
 
-      <SubHeading>Agent Communication</SubHeading>
+      <SubHeading>智能体通信</SubHeading>
       <Paragraph>
-        Agents communicate through files, not direct API calls. This is
-        intentional -- file-based communication is debuggable, auditable, and
-        doesn't create tight coupling.
+        智能体通过文件通信，而不是直接调用 API。这是故意的 —— 基于文件的通信可调试、可审计，不会造成紧密耦合。
       </Paragraph>
 
       <NumberedList
         items={[
           <>
-            <strong>Upstream (reporting up):</strong> An agent writes its output
-            to a file. The team lead or orchestrator reads it on the next run.
-            Example: SCOUT writes topic suggestions, LUMEN reads them to
-            brief STRATEGIST.
+            <strong>上游（向上汇报）：</strong> 智能体将输出写入文件。团队负责人或协调器在下次运行时读取它。示例：SCOUT 写入主题建议，LUMEN 读取它们来给 STRATEGIST 简报。
           </>,
           <>
-            <strong>Downstream (delegating):</strong> A team lead writes a
-            brief file that the specialist reads. Example: HERALD writes an
-            angle brief, QUILL reads it and drafts the post.
+            <strong>下游（委派）：</strong> 团队负责人写入简报文件，专家读取它。示例：HERALD 写入角度简报，QUILL 读取它并起草帖子。
           </>,
           <>
-            <strong>Cross-team (shared context):</strong> Agents read from
-            team-memory. Example: STRATEGIST reads SAGE's ICP profile and
-            ECHO's community voice data to pick the right content angle.
+            <strong>跨团队（共享上下文）：</strong> 智能体从 team-memory 读取。示例：STRATEGIST 读取 SAGE 的 ICP 资料和 ECHO 的社区声音数据来选择正确的内容角度。
           </>,
         ]}
       />
 
       <Callout type="note">
-        The <InlineCode>message</InlineCode> tool exists for real-time
-        coordination (e.g., Pulse alerting LUMEN about a trending topic), but
-        the default communication channel is always files. Messages are for
-        urgency; files are for substance.
+        <InlineCode>message</InlineCode> 工具存在用于实时协调（例如 Pulse 向 LUMEN 发送关于热门话题的提醒），但默认通信渠道始终是文件。消息用于紧急情况；文件用于实质内容。
       </Callout>
 
       {/* ─── Crons ──────────────────────────────────────────── */}
 
-      <SubHeading>Cron Patterns</SubHeading>
+      <SubHeading>Cron 模式</SubHeading>
       <Paragraph>
-        Cron jobs are the heartbeat of an autonomous agent team. Each cron
-        follows the same philosophy: one fetch, one decision, one output.
+        Cron 任务是自主智能体团队的心跳。每个 cron 遵循相同的理念：一次获取，一次决策，一次输出。
       </Paragraph>
 
       <BulletList
         items={[
           <>
-            <strong>Assign crons to the right tier.</strong> Research crons go
-            on leaf agents (SCOUT, TRACE, ECHO). Pipeline crons go on team
-            leads (LUMEN, HERALD). Briefing crons go on the orchestrator
-            (Jarvis).
+            <strong>将 cron 分配到正确的层级。</strong> 研究 cron 放在叶级智能体上 (SCOUT, TRACE, ECHO)。管道 cron 放在团队负责人上 (LUMEN, HERALD)。简报 cron 放在协调器上 (Jarvis)。
           </>,
           <>
-            <strong>Stagger schedules.</strong> Don't run all crons at the same
-            time. Space them out so upstream agents finish before downstream
-            agents read their output.
+            <strong>错开时间表。</strong> 不要同时运行所有 cron。隔开时间，让上游智能体在下游智能体读取其输出之前完成。
           </>,
           <>
-            <strong>Keep crons focused.</strong> Each cron does one thing.
-            "Scan subreddits" is a good cron. "Scan subreddits, analyze
-            sentiment, write a blog post, and publish" is four crons pretending
-            to be one.
+            <strong>保持 cron 专注。</strong> 每个 cron 做一件事。"扫描 subreddit" 是一个好的 cron。"扫描 subreddit、分析情感、写博客并发布"是四个 cron 假装成一个。
           </>,
           <>
-            <strong>Error isolation.</strong> If a cron fails, it should only
-            affect its own output. Other agents reading stale data is better
-            than a cascade failure.
+            <strong>错误隔离。</strong> 如果 cron 失败，它应该只影响自己的输出。其他智能体读取过期数据比级联失败好。
           </>,
         ]}
       />
 
       <Table
-        headers={["Cron", "Agent", "Schedule", "Pattern"]}
+        headers={["Cron", "智能体", "时间表", "模式"]}
         rows={[
           [
-            "Community scan",
+            "社区扫描",
             <strong key="e">ECHO</strong>,
-            "Weekly",
-            "Fetch subreddit posts, extract customer language, write to team-memory",
+            "每周",
+            "获取 subreddit 帖子，提取客户语言，写入 team-memory",
           ],
           [
-            "Trend radar",
+            "趋势雷达",
             <strong key="p">Pulse</strong>,
-            "Every other day",
-            "Scan trending signals, write hot topics file, message LUMEN if urgent",
+            "隔天",
+            "扫描热门信号，写入热门话题文件，如紧急则通知 LUMEN",
           ],
           [
-            "Flight monitor",
+            "航班监控",
             <strong key="k">KAZE</strong>,
-            "Daily",
-            "Check flight prices, message Jarvis if deal found under threshold",
+            "每天",
+            "检查航班价格，如发现低于阈值的优惠则通知 Jarvis",
           ],
           [
-            "Memory compression",
+            "记忆压缩",
             <strong key="s">SCRIBE</strong>,
-            "Weekly",
-            "Read daily logs, compress into MEMORY.md, archive old logs",
+            "每周",
+            "读取每日日志，压缩到 MEMORY.md，归档旧日志",
           ],
           [
-            "Content pipeline",
+            "内容管道",
             <strong key="l">LUMEN</strong>,
-            "Weekly",
-            "Orchestrate SCOUT -> ANALYST -> STRATEGIST -> WRITER -> AUDITOR",
+            "每周",
+            "协调 SCOUT -> ANALYST -> STRATEGIST -> WRITER -> AUDITOR",
           ],
         ]}
       />
 
       {/* ─── Voice ──────────────────────────────────────────── */}
 
-      <SubHeading>Voice System</SubHeading>
+      <SubHeading>语音系统</SubHeading>
       <Paragraph>
-        Agents that interact directly with the operator can have an ElevenLabs
-        voice ID assigned. This enables text-to-speech on their responses in
-        the chat interface. Not every agent needs a voice -- only those the
-        operator talks to regularly.
+        直接与操作员交互的智能体可以分配 ElevenLabs 语音 ID。这在对话界面中启用其响应的文字转语音。不是每个智能体都需要语音 —— 只有操作员定期交谈的那些。
       </Paragraph>
 
       <BulletList
         items={[
           <>
-            <strong>Give voices to conversational agents.</strong> Jarvis
-            (orchestrator), VERA (strategy advisor), Pulse (trend alerts) --
-            agents you chat with benefit from voice.
+            <strong>给对话型智能体语音。</strong> Jarvis (协调器)、VERA (策略顾问)、Pulse (趋势提醒) —— 你与之聊天的智能体受益于语音。
           </>,
           <>
-            <strong>Skip voices for pipeline workers.</strong> SCOUT, ANALYST,
-            WRITER, AUDITOR run in pipelines and rarely need to speak. Don't
-            waste voice slots on them.
+            <strong>跳过管道工作者的语音。</strong> SCOUT、ANALYST、WRITER、AUDITOR 在管道中运行，很少需要说话。不要在他们身上浪费语音槽。
           </>,
           <>
-            Set <InlineCode>voiceId</InlineCode> to{" "}
-            <InlineCode>null</InlineCode> for agents without voice. The UI
-            hides the TTS button when voiceId is null.
+            对于没有语音的智能体，将 <InlineCode>voiceId</InlineCode> 设置为 <InlineCode>null</InlineCode>。当 voiceId 为 null 时，UI 会隐藏 TTS 按钮。
           </>,
         ]}
       />
 
       {/* ─── Design Principles ──────────────────────────────── */}
 
-      <SubHeading>Design Principles</SubHeading>
+      <SubHeading>设计原则</SubHeading>
 
-      <InfoCard title="1. Agents are characters, not functions">
+      <InfoCard title="1. 智能体是角色，不是功能">
         <Paragraph>
-          Each agent has a name, a personality, and a role title. They're not
-          interchangeable worker threads -- they're team members with distinct
-          expertise. VERA thinks strategically. ECHO listens to communities.
-          KAZE watches flights. This makes the team legible and memorable.
+          每个智能体都有一个名字、一个性格和一个角色头衔。它们不是可互换的工作线程 —— 它们是具有独特专业知识的团队成员。VERA 战略性地思考。ECHO 倾听社区。KAZE 监控航班。这使团队清晰易懂且令人难忘。
         </Paragraph>
       </InfoCard>
 
-      <InfoCard title="2. Least privilege, always">
+      <InfoCard title="2. 始终最小权限">
         <Paragraph>
-          An agent should have exactly the tools it needs and nothing more. SAGE
-          is read-only because it's a knowledge base, not an actor. SCRIBE has{" "}
-          <InlineCode>exec</InlineCode> because it needs to run file operations
-          during memory compression. If you're unsure whether an agent needs a
-          tool, start without it. You can always add it later.
+          智能体应该正好拥有它需要的工具，别无其他。SAGE 是只读的，因为它是一个知识库，而不是一个行动者。SCRIBE 有 <InlineCode>exec</InlineCode>，因为它在记忆压缩期间需要运行文件操作。如果你不确定智能体是否需要某个工具，先不加。之后可以随时添加。
         </Paragraph>
       </InfoCard>
 
-      <InfoCard title="3. Files over messages">
+      <InfoCard title="3. 文件优于消息">
         <Paragraph>
-          Prefer file-based communication over real-time messages. Files are
-          inspectable, diffable, and persist across sessions. Messages are for
-          urgent signals only (e.g., Pulse alerting about a breaking trend).
-          Everything else goes through shared files in team-memory.
+          优先使用基于文件的通信而不是实时消息。文件可检查、可比较，并跨会话持久化。消息仅用于紧急信号（例如 Pulse 关于突发趋势的提醒）。其他一切都通过 team-memory 中的共享文件进行。
         </Paragraph>
       </InfoCard>
 
-      <InfoCard title="4. One agent, one job">
+      <InfoCard title="4. 一个智能体，一个工作">
         <Paragraph>
-          Resist the urge to make Swiss Army knife agents. TRACE does market
-          research -- it doesn't also write blog posts. QUILL writes LinkedIn
-          posts -- it doesn't also analyze metrics. When an agent's description
-          needs the word "and" more than once, split it into two agents.
+          抵制制造瑞士军刀式智能体的冲动。TRACE 做市场研究 —— 它不也写博客。QUILL 写领英帖子 —— 它也不分析指标。当一个智能体的描述需要多次使用"和"这个词时，将其拆分成两个智能体。
         </Paragraph>
       </InfoCard>
 
-      <InfoCard title="5. Depth of 3, max">
+      <InfoCard title="5. 最大深度为 3">
         <Paragraph>
-          Jarvis to Robin to TRACE is three levels. Going deeper adds latency
-          and makes the chain of command confusing. If you need more
-          specialization, add lateral agents (more direct reports) instead of
-          deeper nesting.
+          Jarvis 到 Robin 到 TRACE 是三级。再深会增加延迟，使指挥链混乱。如果你需要更多专业化，添加横向智能体（更多直接下属）而不是更深的嵌套。
         </Paragraph>
       </InfoCard>
 
-      <InfoCard title="6. Let SCRIBE handle memory">
+      <InfoCard title="6. 让 SCRIBE 处理记忆">
         <Paragraph>
-          Don't make every agent manage its own memory compression. SCRIBE
-          exists specifically to read daily logs, extract patterns, and update
-          MEMORY.md files. This single responsibility keeps memory consistent
-          and prevents agents from spending cycles on housekeeping instead of
-          their actual job.
+          不要让每个智能体管理自己的记忆压缩。SCRIBE 的存在专门是为了读取每日日志、提取模式并更新 MEMORY.md 文件。这种单一责任保持记忆一致，防止智能体在 housekeeping 上花费周期而不是实际工作。
         </Paragraph>
       </InfoCard>
     </>
